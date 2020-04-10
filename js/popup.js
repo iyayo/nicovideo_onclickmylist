@@ -9,7 +9,9 @@ function getStorageMylist(){
 function setStorageMylist(){
     var id = $('select').val();
     chrome.storage.local.set({nvocm: id}, function(){
-        $('p').text("保存しました");
+        var index = $('select').prop('selectedIndex');
+        chrome.browserAction.setBadgeText({'text': String(index + 1)}, function (){});
+        $('p').show();
         $('p').fadeOut(3000);
     });
 }

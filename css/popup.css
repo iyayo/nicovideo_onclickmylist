@@ -3,3 +3,7 @@ body {
     min-height: 200px;
     text-align: center;
 }
+
+p {
+    display: none;
+}
