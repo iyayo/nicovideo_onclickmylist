@@ -23,7 +23,7 @@ function addMylist(group_id, item_type, item_id, item_amc, token){
       "group_id": group_id,
       "item_type": item_type,
       "item_id": item_id,
-      "description": " ",
+      "description": null,
       "item_amc": item_amc,
       "token": token
     }
