@@ -58,7 +58,6 @@ chrome.runtime.onMessage.addListener(
 
             addMylist(group_id, item_type, item_id, item_amc, token)
             .done(function(value){
-              console.log(value);
               if (value.status == "ok") {
                 sendResponse({status: "マイリストに登録しました"});
               } else {
