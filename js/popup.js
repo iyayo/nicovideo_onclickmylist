@@ -11,8 +11,8 @@ function setStorageMylist(){
     chrome.storage.local.set({nvocm: id}, function(){
         var index = $('select').prop('selectedIndex');
         chrome.browserAction.setBadgeText({'text': String(index + 1)}, function (){});
-        $('p').show();
-        $('p').fadeOut(3000);
+        $('.save_alert').show();
+        $('.save_alert').fadeOut(3000);
     });
 }
 

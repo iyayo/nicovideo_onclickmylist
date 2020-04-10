@@ -1,9 +1,23 @@
-body {
+#mylist_setting_menu {
     min-width: 200px;
     min-height: 200px;
     text-align: center;
 }
 
-p {
+.save_alert {
     display: none;
+}
+
+.onclick_mylist {
+    width: 28px;
+    height: 28px;
+    display: inline-block;
+    vertical-align: top;
+    padding: 0;
+    border: none;
+    background: transparent;
+}
+
+.onclick_mylist:hover {
+    cursor: pointer;
 }

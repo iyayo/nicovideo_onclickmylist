@@ -10,6 +10,7 @@
     "content_scripts": [
       {
         "js": ["/js/jquery.min.js", "/js/script.js"],
+        "css": ["/css/style.css"],
         "matches": ["https://www.nicovideo.jp/watch/*"],
         "all_frames": true,
         "run_at": "document_end"
