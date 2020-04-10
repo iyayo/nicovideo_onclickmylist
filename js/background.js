@@ -27,6 +27,11 @@ chrome.runtime.onMessage.addListener(
         var item_amc = $(value).find('[name="item_amc"]').val();
         var token = value.match(tokenRegex)[1];
       });
+    } else if (request.message == "mylist"){
+      getMylist().done(function(value){
+        var json = value.mylistgroup;
+        sendResponse({data: json});
+      });
     }
 
     return true;
