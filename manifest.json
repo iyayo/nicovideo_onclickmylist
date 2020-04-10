@@ -20,7 +20,8 @@
     },
     "permissions": [
       "storage",
-      "tabs"
+      "tabs",
+      "*://www.nicovideo.jp/*"
     ]
 }
   
