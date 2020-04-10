@@ -1,4 +1,4 @@
-function getMylist(){
+function getMylist() {
   return $.ajax({
     url: 'http://www.nicovideo.jp/api/mylistgroup/list',
     type: 'GET',
@@ -6,12 +6,28 @@ function getMylist(){
   })
 }
 
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-      var url = sender.tab.url;
-      if (request.message == "click"){
-        sendResponse({status: "goodbye"});
-      }
+function getVideoData(videoId) {
+  return $.ajax({
+    url: 'https://www.nicovideo.jp/mylist_add/video/' + videoId,
+    type: 'GET',
+    dataType: 'html'
+  })
+}
 
-      return true;
-    });
+chrome.runtime.onMessage.addListener(
+  function (request, sender, sendResponse) {
+    if (request.message == "click") {
+      const idRegex = /https:\/\/www\.nicovideo\.jp\/watch\/(..\d+)/;
+      var url = sender.tab.url;
+      var videoId = url.match(idRegex)[1];
+      getVideoData(videoId).done(function (value) {
+        const tokenRegex = /NicoAPI\.token = '(.*)';/;
+        var item_type = $(value).find('[name="item_type"]').val();
+        var item_id = $(value).find('[name="item_id"]').val();
+        var item_amc = $(value).find('[name="item_amc"]').val();
+        var token = value.match(tokenRegex)[1];
+      });
+    }
+
+    return true;
+  });
