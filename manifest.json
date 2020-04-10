@@ -2,7 +2,7 @@
     "name": "ニコニコ動画 ワンクリックマイリスト",
     "version": "1.0",
     "manifest_version": 2,
-    "description": "",
+    "description": "ワンクリックで動画を指定したマイリストに登録する",
     "icons" : {
       "16" : "/icon/icon16.png",
       "32" : "/icon/icon32.png",
