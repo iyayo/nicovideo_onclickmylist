@@ -1,81 +1,100 @@
 function getMylist() {
-  return $.ajax({
-    url: 'http://www.nicovideo.jp/api/mylistgroup/list',
-    type: 'GET',
-    dataType: 'json'
-  })
-}
-
-function getVideoData(videoId) {
-  return $.ajax({
-    url: 'https://www.nicovideo.jp/mylist_add/video/' + videoId,
-    type: 'GET',
-    dataType: 'html'
-  })
-}
-
-function addMylist(group_id, item_type, item_id, item_amc, token){
-  return $.ajax({
-    url: 'http://www.nicovideo.jp/api/mylist/add',
-    type: 'POST',
-    dataType: 'json',
-    data: {
-      "group_id": group_id,
-      "item_type": item_type,
-      "item_id": item_id,
-      "description": null,
-      "item_amc": item_amc,
-      "token": token
-    }
-  })
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: 'http://www.nicovideo.jp/api/mylistgroup/list',
+            type: 'GET',
+            dataType: 'json'
+        })
+        .done((result) => {
+            resolve(result.mylistgroup);
+        })
+    })
 }
 
 function getStorageMylist(){
-  return new Promise((resolve, reject) => {
-      chrome.storage.local.get('nvocm', function(value){
-          resolve(value.nvocm);
-      });
-  })
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get('nvocm', (value) => {
+            if(value !== undefined){
+                resolve(value.nvocm);
+            } else {
+                reject("登録先が指定されていません");
+            }
+        });
+    })
 }
 
-chrome.runtime.onMessage.addListener(
-  function (request, sender, sendResponse) {
-    if (request.message == "click") {
-      const idRegex = /https:\/\/www\.nicovideo\.jp\/watch\/(..\d+)/;
-      var url = sender.tab.url;
-      var videoId = url.match(idRegex)[1];
-
-      getStorageMylist()
-      .then(function(group_id){
-        if (group_id !== undefined){
-          getVideoData(videoId)
-          .done(function (value) {
+function getVideoData(videoId, group_id) {
+    return new Promise((resolve,reject) => {
+        $.ajax({
+            url: 'https://www.nicovideo.jp/mylist_add/video/' + videoId,
+            type: 'GET',
+            dataType: 'html'
+        })
+        .done((result) => {
             const tokenRegex = /NicoAPI\.token = '(.*)';/;
-            var item_type = $(value).find('[name="item_type"]').val();
-            var item_id = $(value).find('[name="item_id"]').val();
-            var item_amc = $(value).find('[name="item_amc"]').val();
-            var token = value.match(tokenRegex)[1];
+            var json = {
+                group_id: group_id,
+                item_type: $(result).find('[name="item_type"]').val(),
+                item_id: $(result).find('[name="item_id"]').val(),
+                item_amc: $(result).find('[name="item_amc"]').val(),
+                token: result.match(tokenRegex)[1]
+            };
+            resolve(json);
+        })
+    })
+}
 
-            addMylist(group_id, item_type, item_id, item_amc, token)
-            .done(function(value){
-              if (value.status == "ok") {
-                sendResponse({status: "マイリストに登録しました"});
-              } else {
-                sendResponse({status: value.error.description});
-              }
-            });
-          });
-        } else {
-          sendResponse({status: "登録先が設定されていません"})
-        }
-      })
-    } else if (request.message == "mylist"){
-      getMylist()
-      .done(function(value){
-        var json = value.mylistgroup;
-        sendResponse({data: json});
-      });
+function addMylist(data){
+    return new Promise((resolve,reject) => {
+        $.ajax({
+            url: 'http://www.nicovideo.jp/api/mylist/add',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                "group_id": data.group_id,
+                "item_type": data.item_type,
+                "item_id": data.item_id,
+                "description": null,
+                "item_amc": data.item_amc,
+                "token": data.token
+            }
+        })
+        .done((result) => {
+            if (result.status == "ok") {
+                resolve("マイリストに登録しました");
+            } else {
+                resolve(result.error.description);
+            }
+        })
+    })
+}
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.message == "click") {
+        const idRegex = /https:\/\/www\.nicovideo\.jp\/watch\/(..\d+)/;
+        var url = sender.tab.url;
+        var videoId = url.match(idRegex)[1];
+        getStorageMylist()
+        .then((result) => {
+            return result;
+        })
+        .then((result) => {
+            return getVideoData(videoId, result);
+        })
+        .then((result) => {
+            return addMylist(result);
+        })
+        .then((result) => {
+            sendResponse({ status: result});
+        })
+        .catch((error) => {
+            sendResponse({ status: error });
+        });
+    } else if (request.message == "mylist") {
+        getMylist()
+        .then((result) => {
+            sendResponse({ data: result });
+         });
     }
-
     return true;
-  });
+});
