@@ -94,7 +94,40 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         getMylist()
         .then((result) => {
             sendResponse({ data: result });
-         });
+        });
     }
     return true;
+});
+
+const prop = {
+    type: "normal",
+    id: "onclick_mylist",
+    title: "マイリストに登録",
+    contexts: ["link"],
+    targetUrlPatterns: ["*://*.nicovideo.jp/watch/*"]
+};
+
+chrome.contextMenus.create(prop, function(){});
+
+chrome.contextMenus.onClicked.addListener((info) => {
+    const idRegex = /https:\/\/www\.nicovideo\.jp\/watch\/(..\d+)/;
+    var url = info.linkUrl;
+    var videoId = url.match(idRegex)[1];
+    
+    getStorageMylist()
+    .then((result) => {
+            return result;
+    })
+    .then((result) => {
+            return getVideoData(videoId, result);
+    })
+    .then((result) => {
+            return addMylist(result);
+    })
+    .then((result) => {
+           console.log(result);
+    })
+    .catch((error) => {
+            console.log(error); 
+    });
 });
