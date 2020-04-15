@@ -1,6 +1,6 @@
 function getStorageMylist(){
     return new Promise((resolve, reject) => {
-        chrome.storage.local.get('nvocm', function(value){
+        chrome.storage.local.get('nvocm', (value) => {
             resolve(value.nvocm);
         });
     })
@@ -8,9 +8,9 @@ function getStorageMylist(){
 
 function setStorageMylist(){
     var id = $('select').val();
-    chrome.storage.local.set({nvocm: id}, function(){
+    chrome.storage.local.set({nvocm: id}, () => {
         var index = $('select').prop('selectedIndex');
-        chrome.browserAction.setBadgeText({'text': String(index + 1)}, function (){});
+        chrome.browserAction.setBadgeText({'text': String(index + 1)}, () => {});
         $('.save_alert').show();
         $('.save_alert').fadeOut(3000);
     });
@@ -27,8 +27,8 @@ function setMylist(json, restoreId){
 }
 
 $(window).on('load',function(){
-    chrome.runtime.sendMessage({ message: "mylist" }, function (response) {
-        getStorageMylist().then(function(value){
+    chrome.runtime.sendMessage({ message: "mylist" }, (response) => {
+        getStorageMylist().then((value) => {
             setMylist(response.data, value);
         })
     });
