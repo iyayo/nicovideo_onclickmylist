@@ -32,7 +32,6 @@
     },
     "permissions": [
       "storage",
-      "tabs",
       "contextMenus",
       "*://www.nicovideo.jp/*"
     ]
