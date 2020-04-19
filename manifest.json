@@ -4,30 +4,30 @@
     "manifest_version": 2,
     "description": "ワンクリックで動画を指定したマイリストに登録する",
     "icons" : {
-      "16" : "/icon/icon16.png",
-      "32" : "/icon/icon32.png",
-      "48" : "/icon/icon48.png",
-      "128" : "/icon/icon128.png"
+      "16" : "icon/icon16.png",
+      "32" : "icon/icon32.png",
+      "48" : "icon/icon48.png",
+      "128" : "icon/icon128.png"
     },
     "browser_action": {
       "default_icon" : {
-        "16" : "/icon/icon16.png",
-        "32" : "/icon/icon32.png"
+        "16" : "icon/icon16.png",
+        "32" : "icon/icon32.png"
       },
       "default_title": "マイリスト設定",
-      "default_popup": "/html/popup.html"
+      "default_popup": "html/popup.html"
     },
     "content_scripts": [
       {
-        "js": ["/js/jquery.min.js", "/js/script.js"],
-        "css": ["/css/style.css"],
+        "js": ["js/jquery.min.js", "js/script.js"],
+        "css": ["css/style.css"],
         "matches": ["https://www.nicovideo.jp/watch/*"],
         "all_frames": true,
         "run_at": "document_end"
       }
     ],
     "background": {
-      "scripts": ["/js/jquery.min.js", "/js/background.js"],
+      "scripts": ["js/jquery.min.js", "js/background.js"],
       "persistent": false
     },
     "permissions": [
