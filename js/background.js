@@ -14,7 +14,7 @@ function getMylist() {
 function getStorageMylist(){
     return new Promise((resolve, reject) => {
         chrome.storage.local.get('nvocm', (value) => {
-            if(value !== undefined){
+            if(value.nvocm !== undefined){
                 resolve(value.nvocm);
             } else {
                 reject("登録先が指定されていません");
