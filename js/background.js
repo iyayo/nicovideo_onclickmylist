@@ -63,7 +63,7 @@ function addMylist(data){
             if (result.status == "ok") {
                 resolve("マイリストに登録しました");
             } else {
-                resolve(result.error.description);
+                reject(result.error.description);
             }
         })
     })
