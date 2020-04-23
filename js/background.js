@@ -120,7 +120,7 @@ chrome.contextMenus.onClicked.addListener((info) => {
             return result;
     })
     .then((result) => {
-            return getVideoData(videoId, result.nvocm_id, nvocm_desc);
+            return getVideoData(videoId, result.nvocm_id, result.nvocm_desc);
     })
     .then((result) => {
             return addMylist(result);
