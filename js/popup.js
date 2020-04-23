@@ -35,6 +35,20 @@ function setMylist(json, restoreId){
     }
 }
 
+function changeTab(link){
+    $('.controlTab').each(function (){
+        let val = $(this).attr('href');
+        
+        if (val == link){
+            $(this).attr('id', 'selectedTab');
+            $(val).css('display', 'block');
+        } else {
+            $(this).removeAttr('id');
+            $(val).css('display', 'none');
+        }
+    });
+}
+
 $(window).on('load',function(){
     chrome.runtime.sendMessage({ message: "mylist" }, (response) => {
         getStorageMylist().then((value) => {
@@ -44,5 +58,9 @@ $(window).on('load',function(){
     $('#save').bind('click',setStorageMylist);
     $('select').bind('change', () => {
         setStatus("select");
+    });
+    $('.controlTab').bind('click', function(){
+        let link = $(this).attr('href');
+        changeTab(link);
     });
 });

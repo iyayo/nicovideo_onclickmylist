@@ -10,10 +10,22 @@
 <body style="margin: 0;">
     <div id="mylist_setting_menu">
         <header id="mylist_setting_header">
-            <h1>マイリスト設定</h1>
+            <ul>
+                <li><a href="#mylist_menu" class="controlTab" id="selectedTab">マイリスト</a></li>
+                <li><a href="#desc_menu" class="controlTab">説明文</a></li>
+                <li><a href="#option_menu" class="controlTab">オプション</a></li>
+            </ul>
         </header>
         <div id="mylist_setting_main">
-            <select size='10'></select>
+            <div id="mylist_menu">
+                <select size='10'></select>
+            </div>
+            <div id="desc_menu">
+                説明文
+            </div>
+            <div id="option_menu">
+                オプション
+            </div>
         </div>
         <div id="mylist_setting_status">
         </div>
