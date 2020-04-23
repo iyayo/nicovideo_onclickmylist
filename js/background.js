@@ -13,9 +13,9 @@ function getMylist() {
 
 function getStorageMylist(){
     return new Promise((resolve, reject) => {
-        chrome.storage.local.get('nvocm', (value) => {
-            if(value.nvocm !== undefined){
-                resolve(value.nvocm);
+        chrome.storage.local.get(['nvocm_id', 'nvocm_desc'], (value) => {
+            if(value.nvocm_id !== undefined){
+                resolve(value);
             } else {
                 reject("登録先が指定されていません");
             }
@@ -23,7 +23,7 @@ function getStorageMylist(){
     })
 }
 
-function getVideoData(videoId, group_id) {
+function getVideoData(videoId, group_id, description) {
     return new Promise((resolve,reject) => {
         $.ajax({
             url: 'https://www.nicovideo.jp/mylist_add/video/' + videoId,
@@ -36,6 +36,7 @@ function getVideoData(videoId, group_id) {
                 group_id: group_id,
                 item_type: $(result).find('[name="item_type"]').val(),
                 item_id: $(result).find('[name="item_id"]').val(),
+                description: description,
                 item_amc: $(result).find('[name="item_amc"]').val(),
                 token: result.match(tokenRegex)[1]
             };
@@ -54,7 +55,7 @@ function addMylist(data){
                 "group_id": data.group_id,
                 "item_type": data.item_type,
                 "item_id": data.item_id,
-                "description": null,
+                "description": data.description,
                 "item_amc": data.item_amc,
                 "token": data.token
             }
@@ -79,7 +80,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             return result;
         })
         .then((result) => {
-            return getVideoData(videoId, result);
+            return getVideoData(videoId, result.nvocm_id, result.nvocm_desc);
         })
         .then((result) => {
             return addMylist(result);
@@ -119,7 +120,7 @@ chrome.contextMenus.onClicked.addListener((info) => {
             return result;
     })
     .then((result) => {
-            return getVideoData(videoId, result);
+            return getVideoData(videoId, result.nvocm_id, nvocm_desc);
     })
     .then((result) => {
             return addMylist(result);

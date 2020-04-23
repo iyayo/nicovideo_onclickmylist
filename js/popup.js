@@ -1,7 +1,7 @@
 function getStorageMylist(){
     return new Promise((resolve, reject) => {
-        chrome.storage.local.get('nvocm', (value) => {
-            resolve(value.nvocm);
+        chrome.storage.local.get(['nvocm_id', 'nvocm_desc'], (value) => {
+            resolve(value);
         });
     })
 }
@@ -17,14 +17,17 @@ function setStatus(action){
 
 function setStorageMylist(){
     var id = $('select').val();
-    chrome.storage.local.set({nvocm: id}, () => {
+    var desc = $('textarea').val();
+    chrome.storage.local.set({nvocm_id: id}, () => {
         var index = $('select').prop('selectedIndex');
         chrome.browserAction.setBadgeText({'text': String(index + 1)}, () => {});
         setStatus("save");
     });
+
+    chrome.storage.local.set({nvocm_desc: desc}, () => {});
 }
 
-function setMylist(json, restoreId){
+function setMylist(json, restoreId, restoreDesc){
     for (let i = 0; i < json.length; i++) {
         if (restoreId !== undefined && restoreId == json[i].id){
             $('select').append(`<option selected value=${json[i].id}>${json[i].name}</option>`);
@@ -33,6 +36,7 @@ function setMylist(json, restoreId){
             $('select').append(`<option value=${json[i].id}>${json[i].name}</option>`);
         }
     }
+    $('textarea').val(restoreDesc);
 }
 
 function changeTab(link){
@@ -52,7 +56,7 @@ function changeTab(link){
 $(window).on('load',function(){
     chrome.runtime.sendMessage({ message: "mylist" }, (response) => {
         getStorageMylist().then((value) => {
-            setMylist(response.data, value);
+            setMylist(response.data, value.nvocm_id, value.nvocm_desc);
         })
     });
     $('#save').bind('click',setStorageMylist);
