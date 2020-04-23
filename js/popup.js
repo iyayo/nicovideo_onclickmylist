@@ -6,13 +6,21 @@ function getStorageMylist(){
     })
 }
 
+function setStatus(action){
+    if (action == "select"){
+        let selectedText = $("select option:selected").text();
+        $('#mylist_setting_status').text("選択中：" + selectedText);
+    } else if (action == "save"){
+        $('#mylist_setting_status').text("保存しました");
+    }
+}
+
 function setStorageMylist(){
     var id = $('select').val();
     chrome.storage.local.set({nvocm: id}, () => {
         var index = $('select').prop('selectedIndex');
         chrome.browserAction.setBadgeText({'text': String(index + 1)}, () => {});
-        $('.save_alert').show();
-        $('.save_alert').fadeOut(3000);
+        setStatus("save");
     });
 }
 
@@ -20,6 +28,7 @@ function setMylist(json, restoreId){
     for (let i = 0; i < json.length; i++) {
         if (restoreId !== undefined && restoreId == json[i].id){
             $('select').append(`<option selected value=${json[i].id}>${json[i].name}</option>`);
+            setStatus("select");
         } else {
             $('select').append(`<option value=${json[i].id}>${json[i].name}</option>`);
         }
@@ -33,4 +42,7 @@ $(window).on('load',function(){
         })
     });
     $('#save').bind('click',setStorageMylist);
+    $('select').bind('change', () => {
+        setStatus("select");
+    });
 });
