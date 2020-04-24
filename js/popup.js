@@ -4,7 +4,8 @@ function getStorageMylist(){
             'nvocm_id',
             'nvocm_desc',
             'nvocm_autoClose',
-            'nvocm_selectSize'
+            'nvocm_selectSize',
+            'nvocm_notificationSound'
         ], (value) => {
             resolve(value);
         });
@@ -68,7 +69,8 @@ function changeTab(link){
 function setStorageOption(){
     chrome.storage.local.set({
         nvocm_autoClose: $('#autoClose').prop('checked'),
-        nvocm_selectSize: $('#selectSize').val()
+        nvocm_selectSize: $('#selectSize').val(),
+        nvocm_notificationSound: $('#notificationSound').prop('checked')
     }, () => {
         $('select').attr('size', $('#selectSize').val());
     });
@@ -77,6 +79,7 @@ function setStorageOption(){
 function restoreOption(){
     getStorageMylist().then((value) => {
         $('#autoClose').prop('checked', value.nvocm_autoClose);
+        $('#notificationSound').prop('checked', value.nvocm_notificationSound);
         if (value.nvocm_selectSize != undefined){
             $('#selectSize').val(value.nvocm_selectSize);
             $('select').attr('size', value.nvocm_selectSize);

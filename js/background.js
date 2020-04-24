@@ -13,7 +13,7 @@ function getMylist() {
 
 function getStorageMylist(){
     return new Promise((resolve, reject) => {
-        chrome.storage.local.get(['nvocm_id', 'nvocm_desc'], (value) => {
+        chrome.storage.local.get(['nvocm_id', 'nvocm_desc', 'nvocm_notificationSound'], (value) => {
             if(value.nvocm_id !== undefined){
                 resolve(value);
             } else {
@@ -118,14 +118,13 @@ chrome.contextMenus.onClicked.addListener((info) => {
     
     let NotificationOptions = {
         type: "basic",
+        title: "ワンクリックマイリスト",
         iconUrl: "/icon/icon128.png"
     }
     
     getStorageMylist()
-    .then((result) => {
-            return result;
-    })
-    .then((result) => {
+    .then((result) => { 
+            NotificationOptions.silent = result.nvocm_notificationSound;
             return getVideoData(videoId, result.nvocm_id, result.nvocm_desc);
     })
     .then((result) => {
