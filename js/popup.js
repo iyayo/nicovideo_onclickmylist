@@ -15,11 +15,18 @@ function getStorageMylist(){
 function setStatus(action){
     if (action == "select"){
         let selectedText = $("select option:selected").text();
-        $('#mylist_setting_status span').text("選択中：" + selectedText);
-        $('#mylist_setting_status span').attr('title', selectedText);
+        let selectedVal = $("select option:selected").val()
+        $('#mylist_setting_status span').text("選択中：");
+        $('#mylist_setting_status a').text(selectedText);
+        $('#mylist_setting_status a').attr({
+            'href': 'https://www.nicovideo.jp/my/mylist/#/' + selectedVal,
+            'target': '_blank',
+            'title': selectedText
+        });
     } else if (action == "save"){
-        $('#mylist_setting_status span').text("保存しました");
-        $('#mylist_setting_status span').removeAttr('title');
+        $('#mylist_setting_status span').text("ステータス：");
+        $('#mylist_setting_status a').text("保存しました");
+        $('#mylist_setting_status a').removeAttr('href target title');
     }
 }
 
