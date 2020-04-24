@@ -24,10 +24,18 @@
                 <textarea placeholder="省略可"></textarea>
             </div>
             <div id="option_menu">
-                未実装
+                <form action="#" class="option">
+                    <input type="checkbox" id="autoClose">
+                    <label for="autoClose">保存を押したとき自動でポップアップを閉じる</label>
+                    <br>
+                    <label for="selectSize">マイリストの行数（デフォルト：10）</label>
+                    <br>
+                    <input type="number" id="selectSize" min="1" max="30" value="10">
+                </form>
             </div>
         </div>
         <div id="mylist_setting_status">
+            ステータス
         </div>
         <div id="mylist_setting_button">
             <input type="button" id="save" value="保存">
