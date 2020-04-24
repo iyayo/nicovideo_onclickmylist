@@ -33,6 +33,7 @@
     "permissions": [
       "storage",
       "contextMenus",
+      "notifications",
       "*://www.nicovideo.jp/*"
     ]
 }

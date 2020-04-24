@@ -38,7 +38,8 @@ function getVideoData(videoId, group_id, description) {
                 item_id: $(result).find('[name="item_id"]').val(),
                 description: description,
                 item_amc: $(result).find('[name="item_amc"]').val(),
-                token: result.match(tokenRegex)[1]
+                token: result.match(tokenRegex)[1],
+                videoTitle: $(result).find('h3').text()
             };
             resolve(json);
         })
@@ -115,6 +116,11 @@ chrome.contextMenus.onClicked.addListener((info) => {
     var url = info.linkUrl;
     var videoId = url.match(idRegex)[1];
     
+    let NotificationOptions = {
+        type: "basic",
+        iconUrl: "/icon/icon128.png"
+    }
+    
     getStorageMylist()
     .then((result) => {
             return result;
@@ -123,12 +129,15 @@ chrome.contextMenus.onClicked.addListener((info) => {
             return getVideoData(videoId, result.nvocm_id, result.nvocm_desc);
     })
     .then((result) => {
+            NotificationOptions.message = result.videoTitle;
             return addMylist(result);
     })
     .then((result) => {
-           console.log(result);
+            NotificationOptions.title = result;
+            chrome.notifications.create(NotificationOptions, () => {});
     })
     .catch((error) => {
-            console.log(error); 
+            NotificationOptions.title = error;
+            chrome.notifications.create(NotificationOptions, () => {});
     });
 });
