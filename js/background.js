@@ -71,14 +71,26 @@ function addMylist(data){
     })
 }
 
+function getUserSession(){
+    return new Promise((resolve,reject) => {
+        chrome.cookies.get({url:'https://www.nicovideo.jp/',name:'user_session'}, (value) => {
+            if (value != null){
+                resolve();
+            } else {
+                reject('ログインされていません');
+            }
+        });
+    })
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.message == "click") {
         const idRegex = /https:\/\/www\.nicovideo\.jp\/watch\/(..\d+)/;
         var url = sender.tab.url;
         var videoId = url.match(idRegex)[1];
-        getStorageMylist()
-        .then((result) => {
-            return result;
+        getUserSession()
+        .then(() => {
+            return getStorageMylist();
         })
         .then((result) => {
             return getVideoData(videoId, result.nvocm_id, result.nvocm_desc);
@@ -119,10 +131,13 @@ chrome.contextMenus.onClicked.addListener((info) => {
     let NotificationOptions = {
         type: "basic",
         title: "ワンクリックマイリスト",
+        message: "",
         iconUrl: "/icon/icon128.png"
     }
-    
-    getStorageMylist()
+    getUserSession()
+    .then(() => {
+            return getStorageMylist()
+    })
     .then((result) => { 
             NotificationOptions.silent = result.nvocm_notificationSound;
             return getVideoData(videoId, result.nvocm_id, result.nvocm_desc);

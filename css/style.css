@@ -62,7 +62,6 @@
     white-space: nowrap;
 }
 
-/* Contents Script */
 #mylist_setting_button input {
     width: 100%;
     height: 40px;
@@ -75,17 +74,4 @@
 
 #mylist_setting_button input:hover{
     background-color: #0060d2;
-}
-.onclick_mylist {
-    width: 28px;
-    height: 28px;
-    display: inline-block;
-    vertical-align: top;
-    padding: 0;
-    border: none;
-    background: transparent;
-}
-
-.onclick_mylist:hover {
-    cursor: pointer;
 }
