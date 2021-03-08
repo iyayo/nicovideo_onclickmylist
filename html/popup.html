@@ -2,48 +2,70 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <script src="/js/jquery.min.js"></script>
-    <script src="/js/popup.js"></script>
-    <link rel="stylesheet" type="text/css" href="/css/style.css">
-    <title>マイリスト設定</title>
+    <link rel="stylesheet" href="/css/popup.css">
+    <title>ニコニコ動画 ワンクリックマイリスト</title>
 </head>
-<body style="margin: 0;">
-    <div id="mylist_setting_menu">
-        <header id="mylist_setting_header">
-            <ul>
-                <li><a href="#mylist_menu" class="controlTab" id="selectedTab">マイリスト</a></li>
-                <li><a href="#desc_menu" class="controlTab">コメント</a></li>
-                <li><a href="#option_menu" class="controlTab">オプション</a></li>
+<body>
+    <div id="container">
+        <div id="header">
+            <ul id="navigation">
+                <li data-nav="mylistMenu">マイリスト</li>
+                <li data-nav="commentMenu">コメント</li>
+                <li data-nav="optionMenu">オプション</li>
             </ul>
-        </header>
-        <div id="mylist_setting_main">
-            <div id="mylist_menu">
-                <select size='10'></select>
+        </div>
+
+        <div id="mainMenu">
+            <div id="mylistMenu">
+                <select id="mylistSelect" size="7"></select>
             </div>
-            <div id="desc_menu">
-                <textarea placeholder="省略可" maxlength="256"></textarea>
+            <div id="commentMenu">
+                <textarea name="mylistComment" id="comment" cols="30" rows="10" maxlength="256" placeholder="省略可"></textarea>
+                <div id="commentCountMenu">
+                    <div id="commentCount">
+                        <span>文字数：</span>
+                        <span id="commentLength">0</span>
+                        <span> / 256</span>
+                    </div>
+                    <button id="commentClearButton">クリア</button>
+                </div>
             </div>
-            <div id="option_menu">
-                <form action="#" class="option">
-                    <input type="checkbox" id="autoClose">
-                    <label for="autoClose">保存を押したとき自動でポップアップを閉じる</label>
-                    <br>
-                    <label for="selectSize">マイリストの行数（デフォルト：10）</label>
-                    <br>
-                    <input type="number" id="selectSize" min="1" max="30" value="10">
-                    <br>
-                    <input type="checkbox" id="notificationSound">
-                    <label for="notificationSound">通知音を消す</label>
+            <div id="optionMenu">
+                <form name="options">
+                    <div class="optionItem">
+                        <span class="optionName">マイリストの行数（下限2・上限10）</span>
+                        <div class="optionValue"><input type="number" name="selectSize" value="7" min="2" max="10"></div>
+                    </div>
+                    <div class="optionItem">
+                        <span class="optionName">保存を押したときに自動でポップアップを閉じる</span>
+                        <div class="optionValue"><input type="checkbox" name="autoClose" id="autoClose"><label for="autoClose"><div></div></label></div>
+                    </div>
+                    <div class="optionItem">
+                        <span class="optionName">通知音を消す</span>
+                        <div class="optionValue"><input type="checkbox" name="notificationSound" id="notificationSound"><label for="notificationSound"><div></div></label></div>
+                    </div>
+                    <div class="optionItem">
+                        <span class="optionName">通知の自動消去</span>
+                        <div class="optionValue">
+                            <select name="clearNotificationsTime">
+                                <option value="disable" selected>無効</option>
+                                <option value="5000">5秒後</option>
+                                <option value="7000">7秒後</option>
+                                <option value="15000">15秒後</option>
+                            </select>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
-        <div id="mylist_setting_status">
-            <span>ステータス：</span>
-            <a></a>
+
+        <div id="statusMenu">
+            <span>選択中：</span>
+            <a id="statusLink" target="_blank"><span id="statusText"></span></a>
         </div>
-        <div id="mylist_setting_button">
-            <input type="button" id="save" value="保存">
-        </div>
+        
+        <button id="saveButton">保存</button>
     </div>
+    <script src="/js/popup.js"></script>
 </body>
 </html>

@@ -1,157 +1,140 @@
-function getMylist() {
-    return new Promise((resolve, reject) => {
-        $.ajax({
-            url: 'http://www.nicovideo.jp/api/mylistgroup/list',
-            type: 'GET',
-            dataType: 'json'
-        })
-        .done((result) => {
-            resolve(result.mylistgroup);
-        })
-    })
-}
-
-function getStorageMylist(){
-    return new Promise((resolve, reject) => {
-        chrome.storage.local.get(['nvocm_id', 'nvocm_desc', 'nvocm_notificationSound'], (value) => {
-            if(value.nvocm_id !== undefined){
-                resolve(value);
-            } else {
-                reject("登録先が指定されていません");
-            }
-        });
-    })
-}
-
-function getVideoData(videoId, group_id, description) {
-    return new Promise((resolve,reject) => {
-        $.ajax({
-            url: 'https://www.nicovideo.jp/mylist_add/video/' + videoId,
-            type: 'GET',
-            dataType: 'html'
-        })
-        .done((result) => {
-            const tokenRegex = /NicoAPI\.token = '(.*)';/;
-            var json = {
-                group_id: group_id,
-                item_type: $(result).find('[name="item_type"]').val(),
-                item_id: $(result).find('[name="item_id"]').val(),
-                description: description,
-                item_amc: $(result).find('[name="item_amc"]').val(),
-                token: result.match(tokenRegex)[1],
-                videoTitle: $(result).find('h3').text()
-            };
-            resolve(json);
-        })
-    })
-}
-
-function addMylist(data){
-    return new Promise((resolve,reject) => {
-        $.ajax({
-            url: 'http://www.nicovideo.jp/api/mylist/add',
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                "group_id": data.group_id,
-                "item_type": data.item_type,
-                "item_id": data.item_id,
-                "description": data.description,
-                "item_amc": data.item_amc,
-                "token": data.token
-            }
-        })
-        .done((result) => {
-            if (result.status == "ok") {
-                resolve("マイリストに登録しました");
-            } else {
-                reject(result.error.description);
-            }
-        })
-    })
-}
-
-function getUserSession(){
-    return new Promise((resolve,reject) => {
-        chrome.cookies.get({url:'https://www.nicovideo.jp/',name:'user_session'}, (value) => {
-            if (value != null){
-                resolve();
-            } else {
-                reject('ログインされていません');
-            }
-        });
-    })
-}
-
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.message == "click") {
-        const idRegex = /https:\/\/www\.nicovideo\.jp\/watch\/(..\d+)/;
-        var url = sender.tab.url;
-        var videoId = url.match(idRegex)[1];
-        getUserSession()
-        .then(() => {
-            return getStorageMylist();
-        })
-        .then((result) => {
-            return getVideoData(videoId, result.nvocm_id, result.nvocm_desc);
-        })
-        .then((result) => {
-            return addMylist(result);
-        })
-        .then((result) => {
-            sendResponse({ status: result});
-        })
-        .catch((error) => {
-            sendResponse({ status: error });
-        });
-    } else if (request.message == "mylist") {
-        getMylist()
-        .then((result) => {
-            sendResponse({ data: result });
-        });
-    }
-    return true;
-});
+const regexVideoId = /https:\/\/www\.nicovideo\.jp\/watch\/(..\d+)/;
+const regexToken = /NicoAPI\.token = '(.*)';/;
+const regexItemType = /<input type="hidden" name="item_type" value="(.)">/;
+const regexItemId = /<input type="hidden" name="item_id" value="(.*)">/;
+const regexItemAmc = /<input type="hidden" name="item_amc" value="(.*)">/;
 
 const prop = {
     type: "normal",
     id: "onclick_mylist",
     title: "マイリストに登録",
     contexts: ["link"],
-    targetUrlPatterns: ["*://*.nicovideo.jp/watch/*"]
+    targetUrlPatterns: ["*://www.nicovideo.jp/watch/*"]
 };
 
-chrome.contextMenus.create(prop, function(){});
+let notificationSound = false;
+let clearNotificationsTime = "disable";
 
+chrome.storage.local.get(["nvocm_notificationSound", "nvocm_clearNotificationsTime"], item => {
+    if (item.nvocm_notificationSound !== undefined) notificationSound = item.nvocm_notificationSound;
+    if (item.nvocm_clearNotificationsTime !== undefined) clearNotificationsTime = item.nvocm_clearNotificationsTime;
+})
+
+chrome.storage.local.onChanged.addListener(item => {
+    if (item.nvocm_notificationSound) notificationSound = item.nvocm_notificationSound.newValue;
+    if (item.nvocm_clearNotificationsTime) clearNotificationsTime = item.nvocm_clearNotificationsTime.newValue;
+});
+
+chrome.contextMenus.create(prop);
 chrome.contextMenus.onClicked.addListener((info) => {
-    const idRegex = /https:\/\/www\.nicovideo\.jp\/watch\/(..\d+)/;
-    var url = info.linkUrl;
-    var videoId = url.match(idRegex)[1];
-    
+    const videoId = info.linkUrl.match(regexVideoId)[1];
+
+    Promise.resolve()
+    .then(() => checkUserSession())
+    .then(() => getStorageFormData())
+    .then(item => getFormData(videoId, item[0], item[1]))
+    .then(encodeData)
+    .then(addMylist)
+    .then(res => createNotification(res, notificationSound, clearNotificationsTime))
+    .catch(error => createNotification(error, notificationSound, clearNotificationsTime))
+});
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.message === "addMylist") {
+        const videoId = sender.tab.url.match(regexVideoId)[1];
+
+        Promise.resolve()
+        .then(() => checkUserSession())
+        .then(() => getStorageFormData())
+        .then(item => getFormData(videoId, item[0], item[1]))
+        .then(encodeData)
+        .then(addMylist)
+        .then(res => {
+            if (res.status === "ok") sendResponse("マイリストに登録しました");
+            else if (res.status === "fail") sendResponse(res.error.description);
+        })
+        .catch(error => sendResponse(error))
+    }
+
+    return true;
+})
+
+function checkUserSession(){
+    return new Promise((resolve,reject) => {
+        chrome.cookies.get({url:'https://www.nicovideo.jp/',name:'user_session'}, value => {
+            if (value !== null) resolve();
+            else reject("ログインされていません");
+        });
+    })
+}
+
+function getFormData(videoId, group_id, description) {
+    return new Promise ((resolve, reject) => {
+        fetch("https://www.nicovideo.jp/mylist_add/video/" + videoId)
+        .then(res => res.text())
+        .then(text => {
+            const obj = {
+                group_id: group_id,
+                item_type: text.match(regexItemType)[1],
+                item_id: text.match(regexItemId)[1],
+                description: description,
+                item_amc: text.match(regexItemAmc)[1],
+                token: text.match(regexToken)[1]
+            }
+
+            resolve(obj);
+        })
+    })
+}
+
+function getStorageFormData() {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(["nvocm_id", "nvocm_desc"], item => {
+            if (item.nvocm_id !== undefined) resolve([item.nvocm_id, item.nvocm_desc]);
+            else reject("登録先が設定されていません");
+        });
+    })
+}
+
+function encodeData(data) {
+    let encode = "";
+    for (let key in data) {
+        encode += key + "=" + data[key] + "&";
+    }
+    return encode;
+}
+
+function addMylist(data) {
+    return new Promise ((resolve, reject) => {
+        fetch("http://www.nicovideo.jp/api/mylist/add", { 
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: data
+        })
+        .then(res => res.json())
+        .then(json => resolve(json))
+    })
+}
+
+function createNotification(res, silent, clear) {
     let NotificationOptions = {
         type: "basic",
         title: "ワンクリックマイリスト",
         message: "",
-        iconUrl: "/icon/icon128.png"
+        iconUrl: "icon/icon128.png",
+        silent: silent
     }
-    getUserSession()
-    .then(() => {
-            return getStorageMylist()
-    })
-    .then((result) => { 
-            NotificationOptions.silent = result.nvocm_notificationSound;
-            return getVideoData(videoId, result.nvocm_id, result.nvocm_desc);
-    })
-    .then((result) => {
-            NotificationOptions.message = result.videoTitle;
-            return addMylist(result);
-    })
-    .then((result) => {
-            NotificationOptions.title = result;
-            chrome.notifications.create(NotificationOptions, () => {});
-    })
-    .catch((error) => {
-            NotificationOptions.title = error;
-            chrome.notifications.create(NotificationOptions, () => {});
+
+    if (res.status === "ok") NotificationOptions.message = "マイリストに登録しました";
+    else if (res.status === "fail") NotificationOptions.message = res.error.description;
+    else NotificationOptions.message = res;
+
+    chrome.notifications.create(NotificationOptions, notificationId => {
+        if (clear === "disable") return;
+        setTimeout(() => {
+            chrome.notifications.clear(notificationId);
+        }, clear);
     });
-});
+}
