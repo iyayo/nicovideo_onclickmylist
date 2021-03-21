@@ -129,6 +129,7 @@ function setStatusText () {
 function setStorage() {
     return new Promise((resolve, reject) => {
         if (mylistSelect.selectedIndex !== -1) {
+            chrome.browserAction.setBadgeBackgroundColor({color: "#009688"});
             if (options.badgeMylistName.checked) chrome.browserAction.setBadgeText({"text": String(mylistSelect.options[mylistSelect.selectedIndex].innerText)});
             else  chrome.browserAction.setBadgeText({"text": String(mylistSelect.selectedIndex + 1)});
         }
