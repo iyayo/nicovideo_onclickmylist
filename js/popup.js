@@ -67,6 +67,7 @@ Promise.resolve()
     if (item.nvocm_selectSize !== undefined) options.selectSize.value = item.nvocm_selectSize;
     if (item.nvocm_autoClose !== undefined) options.autoClose.checked = item.nvocm_autoClose;
     if (item.nvocm_notificationSound !== undefined) options.notificationSound.checked = item.nvocm_notificationSound;
+    if (item.nvocm_badgeMylistName !== undefined) options.badgeMylistName.checked = item.nvocm_badgeMylistName;
 })
 .then(setStatusText)
 .then(countCommentLength)
@@ -127,7 +128,11 @@ function setStatusText () {
 
 function setStorage() {
     return new Promise((resolve, reject) => {
-        if (mylistSelect.selectedIndex !== -1) chrome.browserAction.setBadgeText({"text": String(mylistSelect.selectedIndex + 1)});
+        if (mylistSelect.selectedIndex !== -1) {
+            if (options.badgeMylistName.checked) chrome.browserAction.setBadgeText({"text": String(mylistSelect.options[mylistSelect.selectedIndex].innerText)});
+            else  chrome.browserAction.setBadgeText({"text": String(mylistSelect.selectedIndex + 1)});
+        }
+        
         chrome.storage.local.set({
             nvocm_id: mylistSelect.value,
             nvocm_desc: comment.value,
@@ -135,7 +140,8 @@ function setStorage() {
             nvocm_selectSize: options.selectSize.value,
             nvocm_autoClose: options.autoClose.checked,
             nvocm_notificationSound: options.notificationSound.checked,
-            nvocm_clearNotificationsTime: options.clearNotificationsTime.options[options.clearNotificationsTime.options.selectedIndex].value
+            nvocm_clearNotificationsTime: options.clearNotificationsTime.options[options.clearNotificationsTime.options.selectedIndex].value,
+            nvocm_badgeMylistName: options.badgeMylistName.checked
         }, () => resolve());
     })
 }
