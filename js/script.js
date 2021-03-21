@@ -1,7 +1,8 @@
 window.onload = function () {
     let name = "ワンクリックマイリスト";
 
-    const target = document.querySelector(".VideoMenuContainer-areaLeft");
+    const parentNode = document.querySelector(".VideoMenuContainer-areaLeft");
+    const referenceNode = document.querySelector("section.VideoMenuLikeFieldContainer").nextSibling;
     const div = document.createElement("div");
     div.className = "ClickInterceptor LoginRequirer is-inline";
 
@@ -11,7 +12,7 @@ window.onload = function () {
     button.dataset.title = name;
     button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 13h-5v5h-2v-5h-5v-2h5v-5h2v5h5v2z"/></svg>`;
 
-    target.prepend(div);
+    parentNode.insertBefore(div, referenceNode);
     div.appendChild(button);
 
     chrome.storage.local.get(["nvocm_name"], item => {
