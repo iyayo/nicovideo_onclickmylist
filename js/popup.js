@@ -1,6 +1,8 @@
 const navigation = document.getElementById("navigation");
 const mainMenu = document.querySelectorAll("div#mainMenu > div");
 const mylistSelect = document.getElementById("mylistSelect");
+const selected = mylistSelect.getElementsByClassName("selected");
+const selectHeight = 45;
 const comment = document.getElementById("comment");
 const commentClearButton = document.getElementById("commentClearButton");
 const saveButton = document.getElementById("saveButton");
@@ -14,7 +16,14 @@ navigation.addEventListener("click", e => {
     })
 })
 
-mylistSelect.addEventListener("change", setStatusText);
+mylistSelect.addEventListener("click", e => {
+    for (let i = 0; i < mylistSelect.children.length; i++) {
+        mylistSelect.children[i].className = "";
+    }
+    
+    e.target.className = "selected";
+    setStatusText();
+});
 
 comment.addEventListener("input", countCommentLength);
 
@@ -23,7 +32,7 @@ commentClearButton.addEventListener("click", () => {
     countCommentLength();
 });
 
-options.selectSize.addEventListener("change", e => mylistSelect.size = e.target.value);
+options.selectSize.addEventListener("change", e => mylistSelect.style.height = e.target.value * selectHeight + "px");
 
 saveButton.addEventListener("click", () => {
     Promise.resolve()
@@ -51,8 +60,8 @@ Promise.resolve()
 .then(getMylist)
 .then(getStorage)
 .then(item => {
-    for (let i = 0; i < mylistSelect.options.length; i++) {
-        if (mylistSelect.options[i].value === item.nvocm_id) mylistSelect.options[i].selected = true;
+    for (let i = 0; i < mylistSelect.children.length; i++) {
+        if (mylistSelect.children[i].dataset.id === item.nvocm_id) mylistSelect.children[i].className = "selected";
     }
 
     for (let i = 0; i < options.clearNotificationsTime.options.length; i++) {
@@ -60,7 +69,7 @@ Promise.resolve()
     }
 
     if (item.nvocm_selectSize !== undefined && item.nvocm_selectSize > 1 && item.nvocm_selectSize < 11) {
-        mylistSelect.size = item.nvocm_selectSize;
+        mylistSelect.style.height = item.nvocm_selectSize * selectHeight + "px";
     }
 
     if (item.nvocm_desc !== undefined) comment.value = item.nvocm_desc;
@@ -92,9 +101,9 @@ function getMylist() {
         .then(arr => {
             console.log(arr);
             for (let i = 0; i < arr.length; i++) {
-                const mylistOption = document.createElement("option");
+                const mylistOption = document.createElement("li");
                 mylistOption.innerText = arr[i].name;
-                mylistOption.value = arr[i].id;
+                mylistOption.dataset.id = arr[i].id;
                 mylistOption.dataset.num = i + 1;
                 mylistOption.dataset.name = arr[i].name;
                 mylistOption.dataset.description = arr[i].description;
@@ -116,34 +125,35 @@ function countCommentLength() {
 }
 
 function setStatusText () {
+    if (selected.length === 0) return;
     const statusText = document.getElementById("statusText");
     const statusLink = document.getElementById("statusLink");
-    const index = mylistSelect.selectedIndex;
 
-    if (index === -1) return;
-
-    statusText.innerText = mylistSelect[index].innerText;
-    statusLink.href = mylistSelect[index].dataset.url;
+    statusText.innerText = selected[0].innerText;
+    statusLink.href = selected[0].dataset.url;
 }
 
 function setStorage() {
     return new Promise((resolve, reject) => {
-        if (mylistSelect.selectedIndex !== -1) {
-            chrome.browserAction.setBadgeBackgroundColor({color: "#009688"});
-            if (options.badgeMylistName.checked) chrome.browserAction.setBadgeText({"text": String(mylistSelect.options[mylistSelect.selectedIndex].innerText)});
-            else  chrome.browserAction.setBadgeText({"text": String(mylistSelect.selectedIndex + 1)});
-        }
-        
-        chrome.storage.local.set({
-            nvocm_id: mylistSelect.value,
+        const data = {
             nvocm_desc: comment.value,
-            nvocm_name: mylistSelect.options[mylistSelect.selectedIndex].innerText,
             nvocm_selectSize: options.selectSize.value,
             nvocm_autoClose: options.autoClose.checked,
             nvocm_notificationSound: options.notificationSound.checked,
             nvocm_clearNotificationsTime: options.clearNotificationsTime.options[options.clearNotificationsTime.options.selectedIndex].value,
             nvocm_badgeMylistName: options.badgeMylistName.checked
-        }, () => resolve());
+        }
+
+        if (selected.length !== 0) {
+            chrome.browserAction.setBadgeBackgroundColor({color: "#009688"});
+            if (options.badgeMylistName.checked) chrome.browserAction.setBadgeText({"text": String(selected[0].innerText)});
+            else  chrome.browserAction.setBadgeText({"text": String(selected[0].dataset.num)});
+
+            data.nvocm_id = selected[0].dataset.id;
+            data.nvocm_name = selected[0].innerText;
+        }
+        
+        chrome.storage.local.set(data, () => resolve());
     })
 }
 
