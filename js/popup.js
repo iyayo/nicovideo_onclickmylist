@@ -140,7 +140,7 @@ function setStorage() {
             nvocm_selectSize: options.selectSize.value,
             nvocm_autoClose: options.autoClose.checked,
             nvocm_notificationSound: options.notificationSound.checked,
-            nvocm_clearNotificationsTime: options.clearNotificationsTime.options[options.clearNotificationsTime.options.selectedIndex].value,
+            nvocm_clearNotificationsTime: options.clearNotificationsTime.value,
             nvocm_badgeMylistName: options.badgeMylistName.checked
         }
 
