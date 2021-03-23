@@ -1,7 +1,7 @@
 :root {
-    --primary-color: #009688;
-    --primary-light: #52c7b8;
-    --primary-dark: #00675b;
+    --primary-color: #26a69a;
+    --primary-light: #64d8cb;
+    --primary-dark: #00766c;
     --secondary-color: #ff9800;
     --secondary-light: #ffc947;
     --secondary-dark: #c66900;
@@ -18,9 +18,11 @@ body {
     width: 500px;
     max-height: 600px;
     flex-direction: column;
+    overflow: hidden;
 }
 
-#header {
+nav {
+    height: 65px;
     background-color: var(--primary-color);
 }
 
@@ -35,7 +37,8 @@ body {
 
 #navigation li {
     font-size: 1.4em;
-    font-weight: bold;
+    font-weight: 600;
+    opacity: 87%;
     padding: 8px;
     border-radius: 5px;
     background-color: var(--primary-color);
@@ -58,37 +61,57 @@ body {
     box-sizing: border-box;
 }
 
-#mylistMenu ul {
+#mylistSelect {
     width: 100%;
     height: 360px;
     list-style: none;
     padding: 0;
     margin: 0;
-    overflow-y: scroll;
-    counter-reset: mylistConter;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
-#mylistMenu li {
-    height: 25px;
+#mylistSelect li {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 50px;
     padding: 10px;
-    font-size: 1.4em;
-    background-color: #f5f5f6;
+    background-color: #fff;
     transition: var(--animation-speed);
     cursor: pointer;
-    counter-increment: mylistConter;
+    box-sizing: border-box;
 }
 
-#mylistMenu li:hover {
+#mylistSelect li:hover {
     background-color: #e1e2e1;
 }
 
-#mylistMenu li::before {
-    content: counter(mylistConter) ". ";
-    color: var(--primary-light);
+#mylistSelect li.selected {
+    background-color: #e1e2e1; 
 }
 
-#mylistMenu li.selected {
-    background-color: #cfd8dc; 
+#mylistSelect li:not(:first-of-type) {
+    border-top: 2px solid #f5f5f5;
+}
+
+.mylistNum {
+    display: block;
+    width: 25px;
+    color: var(--primary-light);
+    font-size: 1.4em;
+    font-weight: 500;
+    pointer-events: none;
+}
+
+.mylistName {
+    display: block;
+    max-width: 430px;
+    font-size: 1.4em;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    pointer-events: none;
 }
 
 #commentMenu {
@@ -213,16 +236,25 @@ select[name="clearNotificationsTime"] {
 
 #statusMenu {
     display: flex;
+    flex-direction: row;
     align-items: center;
     height: 40px;
     background-color: var(--primary-light);
 }
 
 #statusMenu span {
+    display: block;
     margin-left: 5px;
     font-size: 1.4em;
-    font-weight: bold;
+    font-weight: 600;
     opacity: 87%;
+}
+
+#statusText {
+    max-width: 360px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 #saveButton {
@@ -232,7 +264,7 @@ select[name="clearNotificationsTime"] {
     width: 58px;
     height: 58px;
     font-size: 1.2em;
-    border: 2px solid var(--secondary-color);
+    border: 0;
     border-radius: 29px;
     background-color: var(--secondary-light);
     transition: var(--animation-speed);
@@ -241,5 +273,5 @@ select[name="clearNotificationsTime"] {
 }
 
 #saveButton:hover:not(.complete){
-    background-color: var(--secondary-dark);
+    background-color: var(--secondary-color);
 }

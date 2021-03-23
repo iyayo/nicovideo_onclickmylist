@@ -2,7 +2,7 @@ const navigation = document.getElementById("navigation");
 const mainMenu = document.querySelectorAll("div#mainMenu > div");
 const mylistSelect = document.getElementById("mylistSelect");
 const selected = mylistSelect.getElementsByClassName("selected");
-const selectHeight = 45;
+const selectHeight = 50;
 const comment = document.getElementById("comment");
 const commentClearButton = document.getElementById("commentClearButton");
 const saveButton = document.getElementById("saveButton");
@@ -20,7 +20,7 @@ mylistSelect.addEventListener("click", e => {
     for (let i = 0; i < mylistSelect.children.length; i++) {
         mylistSelect.children[i].className = "";
     }
-    
+
     e.target.className = "selected";
     setStatusText();
 });
@@ -102,13 +102,20 @@ function getMylist() {
             console.log(arr);
             for (let i = 0; i < arr.length; i++) {
                 const mylistOption = document.createElement("li");
-                mylistOption.innerText = arr[i].name;
+                const mylistNum = document.createElement("span");
+                const mylistName = document.createElement("span");
+                mylistNum.className = "mylistNum";
+                mylistNum.innerText = i + 1 + ".";
+                mylistName.className = "mylistName";
+                mylistName.innerText = arr[i].name;
                 mylistOption.dataset.id = arr[i].id;
                 mylistOption.dataset.num = i + 1;
                 mylistOption.dataset.name = arr[i].name;
                 mylistOption.dataset.description = arr[i].description;
                 mylistOption.dataset.url = "https://www.nicovideo.jp/my/mylist/" + arr[i].id;
                 mylistSelect.appendChild(mylistOption);
+                mylistOption.appendChild(mylistNum);
+                mylistOption.appendChild(mylistName);
             }
             resolve();
         })
@@ -129,7 +136,7 @@ function setStatusText () {
     const statusText = document.getElementById("statusText");
     const statusLink = document.getElementById("statusLink");
 
-    statusText.innerText = selected[0].innerText;
+    statusText.innerText = selected[0].dataset.name;
     statusLink.href = selected[0].dataset.url;
 }
 
@@ -145,12 +152,12 @@ function setStorage() {
         }
 
         if (selected.length !== 0) {
-            chrome.browserAction.setBadgeBackgroundColor({color: "#009688"});
-            if (options.badgeMylistName.checked) chrome.browserAction.setBadgeText({"text": String(selected[0].innerText)});
+            chrome.browserAction.setBadgeBackgroundColor({color: "#26a69a"});
+            if (options.badgeMylistName.checked) chrome.browserAction.setBadgeText({"text": String(selected[0].dataset.name)});
             else  chrome.browserAction.setBadgeText({"text": String(selected[0].dataset.num)});
 
             data.nvocm_id = selected[0].dataset.id;
-            data.nvocm_name = selected[0].innerText;
+            data.nvocm_name = selected[0].dataset.name;
         }
         
         chrome.storage.local.set(data, () => resolve());
