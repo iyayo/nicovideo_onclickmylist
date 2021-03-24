@@ -95,9 +95,9 @@ function checkUserSession(){
 
 function getMylist() {
     return new Promise((resolve, reject) => {
-        fetch("http://www.nicovideo.jp/api/mylistgroup/list", { method: "GET" })
+        fetch("https://nvapi.nicovideo.jp/v1/users/me/mylists", { "headers": { "x-frontend-id": "6" }, "method": "GET" })
         .then(response => response.json())
-        .then(obj => obj.mylistgroup)
+        .then(obj => obj.data.mylists)
         .then(arr => {
             console.log(arr);
             for (let i = 0; i < arr.length; i++) {
