@@ -3,8 +3,8 @@ const mainMenu = document.querySelectorAll("div#mainMenu > div");
 const mylistSelect = document.getElementById("mylistSelect");
 const selected = mylistSelect.getElementsByClassName("selected");
 const selectHeight = 50;
-const comment = document.getElementById("comment");
-const commentClearButton = document.getElementById("commentClearButton");
+const memo = document.getElementById("memo");
+const memoClearButton = document.getElementById("memoClearButton");
 const saveButton = document.getElementById("saveButton");
 const options = document.forms["options"];
 
@@ -25,11 +25,11 @@ mylistSelect.addEventListener("click", e => {
     setStatusText();
 });
 
-comment.addEventListener("input", countCommentLength);
+memo.addEventListener("input", countMemoLength);
 
-commentClearButton.addEventListener("click", () => {
-    comment.value = null;
-    countCommentLength();
+memoClearButton.addEventListener("click", () => {
+    memo.value = null;
+    countMemoLength();
 });
 
 options.selectSize.addEventListener("change", e => mylistSelect.style.height = e.target.value * selectHeight + "px");
@@ -72,14 +72,14 @@ Promise.resolve()
         mylistSelect.style.height = item.nvocm_selectSize * selectHeight + "px";
     }
 
-    if (item.nvocm_desc !== undefined) comment.value = item.nvocm_desc;
+    if (item.nvocm_desc !== undefined) memo.value = item.nvocm_desc;
     if (item.nvocm_selectSize !== undefined) options.selectSize.value = item.nvocm_selectSize;
     if (item.nvocm_autoClose !== undefined) options.autoClose.checked = item.nvocm_autoClose;
     if (item.nvocm_notificationSound !== undefined) options.notificationSound.checked = item.nvocm_notificationSound;
     if (item.nvocm_badgeMylistName !== undefined) options.badgeMylistName.checked = item.nvocm_badgeMylistName;
 })
 .then(setStatusText)
-.then(countCommentLength)
+.then(countMemoLength)
 .catch(error => {
     mainMenu[0].innerHTML = `<div id="errorMessage">${error}</div>`;
 })
@@ -122,13 +122,13 @@ function getMylist() {
     })
 }
 
-function countCommentLength() {
-    const commentLength = document.getElementById("commentLength");
-    const count = comment.value.length;
-    commentLength.innerText = count;
+function countMemoLength() {
+    const memoLength = document.getElementById("memoLength");
+    const count = memo.value.length;
+    memoLength.innerText = count;
 
-    if (count === 256) commentLength.style.color = "red";
-    else commentLength.style.color = "";
+    if (count === 256) memoLength.style.color = "red";
+    else memoLength.style.color = "";
 }
 
 function setStatusText () {
@@ -143,7 +143,7 @@ function setStatusText () {
 function setStorage() {
     return new Promise((resolve, reject) => {
         const data = {
-            nvocm_desc: comment.value,
+            nvocm_desc: memo.value,
             nvocm_selectSize: options.selectSize.value,
             nvocm_autoClose: options.autoClose.checked,
             nvocm_notificationSound: options.notificationSound.checked,

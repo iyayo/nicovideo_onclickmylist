@@ -115,11 +115,12 @@ nav {
 }
 
 #commentMenu {
+#memoMenu {
     display: none;
     height: 280px;
 }
 
-#commentCountMenu {
+#memoCountMenu {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
@@ -127,13 +128,13 @@ nav {
     padding: 10px;
 }
 
-#commentCountMenu span {
+#memoCountMenu span {
     font-size: 1.4em;
     font-weight: bold;
     opacity: 87%;
 }
 
-#commentClearButton {
+#memoClearButton {
     padding: 5px 10px;
     border-radius: 5px;
     background-color: var(--secondary-light);
@@ -143,11 +144,11 @@ nav {
     cursor: pointer;
 }
 
-#commentClearButton:hover {
+#memoClearButton:hover {
     background-color: var(--secondary-color);
 }
 
-#comment {
+#memo {
     display: block;
     width: 80%;
     margin: 0 auto;
