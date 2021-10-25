@@ -27,13 +27,15 @@
   ],
   "background": {
     "scripts": ["js/background.js"],
-    "persistent": false
+    "persistent": true
   },
   "permissions": [
     "cookies",
     "contextMenus",
     "notifications",
     "storage",
+    "webRequest",
+    "webRequestBlocking",
     "*://*.nicovideo.jp/*"
   ]
 }
