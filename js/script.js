@@ -1,5 +1,6 @@
 window.onload = function () {
     let name = "ワンクリックマイリスト";
+    let mylistId = undefined;
 
     const parentNode = document.querySelector(".VideoMenuContainer-areaLeft");
     const referenceNode = document.querySelector("section.VideoMenuLikeFieldContainer").nextSibling;
@@ -15,10 +16,14 @@ window.onload = function () {
     parentNode.insertBefore(div, referenceNode);
     div.appendChild(button);
 
-    chrome.storage.local.get(["nvocm_name"], item => {
+    chrome.storage.local.get(["nvocm_name", "nvocm_id"], item => {
         if (item.nvocm_name !== undefined) {
             name = item.nvocm_name;
             button.dataset.title = item.nvocm_name;
+        }
+
+        if (item.nvocm_id !== undefined) {
+            mylistId = item.nvocm_id;
         }
     })
 
@@ -27,22 +32,50 @@ window.onload = function () {
             name = item.nvocm_name.newValue;
             button.dataset.title = item.nvocm_name.newValue;
         }
+
+        if (item.nvocm_id) {
+            mylistId = item.nvocm_id.newValue;
+        }
     })
 
-    button.addEventListener("click", addMylist);
+    button.addEventListener("click", () => {
+        if (mylistId === undefined) {
+            button.classList.add("is-failed");
+            button.dataset.title = "登録先が指定されていません";
+            timeoutID = window.setTimeout(resetDataTitle, 5000);
+            return;
+        }
+        
+        addMylist(mylistId, location.pathname.split("/watch/")[1]);
+    });
 
     function resetDataTitle() {
         button.classList.remove("is-succeeded", "is-failed");
         button.dataset.title = name;
     }
 
-    function addMylist() {
-        chrome.runtime.sendMessage({ message: "addMylist" }, (response) => {
-            if (response === "マイリストに登録しました") button.classList.add("is-succeeded");
-            else button.classList.add("is-failed");
+    function addMylist(mylistId, videoId) {
+        fetch(`https://nvapi.nicovideo.jp/v1/users/me/mylists/${mylistId}/items?itemId=${videoId}&description=`, {
+            "headers": {
+                "x-frontend-id": "23",
+                "x-request-with": "N-garage"
+            },
+            "method": "POST",
+            "credentials": "include"
+        })
+        .then(res => {
+            if (res.status === 201) {
+                button.classList.add("is-succeeded");
+                button.dataset.title = "マイリストに登録しました";
+            } else if (res.status === 200) {
+                button.classList.add("is-failed");
+                button.dataset.title = "マイリストに登録済みです";
+            } else {
+                button.classList.add("is-failed");
+                button.dataset.title = "登録に失敗しました";
+            }
 
-            button.dataset.title = response;
             timeoutID = window.setTimeout(resetDataTitle, 5000);
-        });
+        })
     }
 }
