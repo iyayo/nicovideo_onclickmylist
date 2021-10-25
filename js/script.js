@@ -3,7 +3,7 @@ window.onload = function () {
     let mylistId = undefined;
 
     const parentNode = document.querySelector(".VideoMenuContainer-areaLeft");
-    const referenceNode = document.querySelector("section.VideoMenuLikeFieldContainer").nextSibling;
+    const referenceNode = document.querySelector("span.VideoMenuGiftContainer").nextSibling;
     const div = document.createElement("div");
     div.className = "ClickInterceptor LoginRequirer is-inline";
 
