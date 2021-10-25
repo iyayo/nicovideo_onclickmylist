@@ -28,7 +28,10 @@ chrome.contextMenus.onClicked.addListener((info) => {
     Promise.resolve()
     .then(() => checkUserSession())
     .then(() => getStorageFormData())
-    .then(item => addMylist(item[0], videoId, encodeURIComponent(item[1])))
+    .then(item => {
+        if (item[0] === "watchlater") return addWatchLater(videoId, encodeURIComponent(item[1]));
+        else return addMylist(item[0], videoId, encodeURIComponent(item[1]));
+    })
     .then(res => createNotification(res, notificationSound, clearNotificationsTime))
     .catch(error => createNotification(error, notificationSound, clearNotificationsTime))
 });
@@ -40,12 +43,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         Promise.resolve()
         .then(() => checkUserSession())
         .then(() => getStorageFormData())
-        .then(item => addMylist(item[0], videoId, encodeURIComponent(item[1])))
-        .then(res => {
-            if (res.status === 201) sendResponse("マイリストに登録しました");
-            else if (res.status === 200) sendResponse("マイリストに登録済みです");
-            else sendResponse("登録に失敗しました");
+        .then(item => {
+            if (item[0] === "watchlater") return addWatchLater(videoId, encodeURIComponent(item[1]));
+            else  return addMylist(item[0], videoId, encodeURIComponent(item[1]));
         })
+        .then(res => sendResponse(res))
         .catch(error => sendResponse(error))
     }
 
@@ -70,6 +72,24 @@ function getStorageFormData() {
     })
 }
 
+function addWatchLater(videoId, description) {
+    return new Promise ((resolve, reject) => {
+        fetch(`https://nvapi.nicovideo.jp/v1/users/me/watch-later?watchId=${videoId}&memo=${description}`, {
+            "headers": {
+                "x-frontend-id": "23",
+                "x-request-with": "N-garage"
+            },
+            "method": "POST",
+            "credentials": "include"
+        })
+        .then(res => {
+            if (res.status === 201) resolve("あとで見るに登録しました");
+            else if (res.status === 409) resolve("あとで見るに登録済みです");
+            else resolve("登録に失敗しました");
+        })
+    })
+}
+
 function addMylist(mylistId, videoId, description) {
     return new Promise ((resolve, reject) => {
         fetch(`https://nvapi.nicovideo.jp/v1/users/me/mylists/${mylistId}/items?itemId=${videoId}&description=${description}`, {
@@ -80,7 +100,12 @@ function addMylist(mylistId, videoId, description) {
             "method": "POST",
             "credentials": "include"
         })
-        .then(res => resolve(res))
+        .then(res => {
+            console.log(res);
+            if (res.status === 201) resolve("マイリストに登録しました");
+            else if (res.status === 200) resolve("マイリストに登録済みです");
+            else resolve("登録に失敗しました");
+        })
     })
 }
 
@@ -93,9 +118,7 @@ function createNotification(res, silent, clear) {
         silent: silent
     }
 
-    if (res.status === 201) NotificationOptions.message = "マイリストに登録しました";
-    else if (res.status === 200) NotificationOptions.message = "マイリストに登録済みです";
-    else NotificationOptions.message = "登録に失敗しました";
+    NotificationOptions.message = res;
 
     chrome.notifications.create(NotificationOptions, notificationId => {
         if (clear === "disable") return;

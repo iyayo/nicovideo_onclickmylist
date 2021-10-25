@@ -105,11 +105,11 @@ function getMylist() {
                 const mylistNum = document.createElement("span");
                 const mylistName = document.createElement("span");
                 mylistNum.className = "mylistNum";
-                mylistNum.innerText = i + 1 + ".";
+                mylistNum.innerText = i + 2 + ".";
                 mylistName.className = "mylistName";
                 mylistName.innerText = arr[i].name;
                 mylistOption.dataset.id = arr[i].id;
-                mylistOption.dataset.num = i + 1;
+                mylistOption.dataset.num = i + 2;
                 mylistOption.dataset.name = arr[i].name;
                 mylistOption.dataset.description = arr[i].description;
                 mylistOption.dataset.url = "https://www.nicovideo.jp/my/mylist/" + arr[i].id;
