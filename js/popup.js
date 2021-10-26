@@ -104,10 +104,13 @@ function getMylist() {
                 const mylistOption = document.createElement("li");
                 const mylistNum = document.createElement("span");
                 const mylistName = document.createElement("span");
+                const mylistItemsCount = document.createElement("span"); 
                 mylistNum.className = "mylistNum";
                 mylistNum.innerText = i + 2 + ".";
                 mylistName.className = "mylistName";
                 mylistName.innerText = arr[i].name;
+                mylistItemsCount.className = "mylistItemsCount";
+                mylistItemsCount.innerText = arr[i].itemsCount;
                 mylistOption.dataset.id = arr[i].id;
                 mylistOption.dataset.num = i + 2;
                 mylistOption.dataset.name = arr[i].name;
@@ -116,6 +119,7 @@ function getMylist() {
                 mylistSelect.appendChild(mylistOption);
                 mylistOption.appendChild(mylistNum);
                 mylistOption.appendChild(mylistName);
+                mylistOption.appendChild(mylistItemsCount);
             }
             resolve();
         })

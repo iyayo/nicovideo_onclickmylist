@@ -106,12 +106,17 @@ nav {
 
 .mylistName {
     display: block;
-    max-width: 430px;
+    max-width: 405px;
     font-size: 1.4em;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     pointer-events: none;
+}
+
+.mylistItemsCount {
+    display: block;
+    margin-left: auto;
 }
 
 #memoMenu {
