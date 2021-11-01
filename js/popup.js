@@ -1,6 +1,7 @@
 const navigation = document.getElementById("navigation");
 const mainMenu = document.querySelectorAll("div#mainMenu > div");
 const mylistSelect = document.getElementById("mylistSelect");
+const watchlaterItemsCount = document.getElementById("watchlaterItemsCount");
 const selected = mylistSelect.getElementsByClassName("selected");
 const selectHeight = 50;
 const memo = document.getElementById("memo");
@@ -95,6 +96,11 @@ function checkUserSession(){
 
 function getMylist() {
     return new Promise((resolve, reject) => {
+        fetch("https://nvapi.nicovideo.jp/v1/users/me/watch-later", { "headers": { "x-frontend-id": "6" }, "method": "GET" })
+        .then(response => response.json())
+        .then(obj => obj.data.watchLater.totalCount)
+        .then(count => watchlaterItemsCount.innerText = count)
+
         fetch("https://nvapi.nicovideo.jp/v1/users/me/mylists", { "headers": { "x-frontend-id": "6" }, "method": "GET" })
         .then(response => response.json())
         .then(obj => obj.data.mylists)
