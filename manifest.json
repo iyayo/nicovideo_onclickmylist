@@ -1,7 +1,7 @@
 {
   "name": "ニコニコ動画 ワンクリックマイリスト",
   "version": "2.1",
-  "manifest_version": 2,
+  "manifest_version": 3,
   "description": "ワンクリックであらかじめ設定したマイリストに動画を登録できる拡張機能です。",
   "icons" : {
     "16" : "icon/icon16.png",
@@ -9,7 +9,7 @@
     "48" : "icon/icon48.png",
     "128" : "icon/icon128.png"
   },
-  "browser_action": {
+  "action": {
     "default_icon" : {
       "16" : "icon/icon16.png",
       "32" : "icon/icon32.png",
@@ -26,16 +26,23 @@
     }
   ],
   "background": {
-    "scripts": ["js/background.js"],
-    "persistent": true
+    "service_worker": "js/background.js"
+  },
+  "declarative_net_request": {
+    "rule_resources": [{
+      "id": "ruleset",
+      "enabled": true,
+      "path": "json/rules.json"
+    }]
   },
   "permissions": [
     "cookies",
     "contextMenus",
     "notifications",
     "storage",
-    "webRequest",
-    "webRequestBlocking",
+    "declarativeNetRequest"
+  ],
+  "host_permissions": [
     "*://*.nicovideo.jp/*"
   ]
 }
