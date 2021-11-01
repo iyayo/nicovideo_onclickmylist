@@ -38,7 +38,7 @@ window.onload = function () {
 
     function addMylist() {
         chrome.runtime.sendMessage({ message: "addMylist" }, (response) => {
-            if (response === "マイリストに登録しました") button.classList.add("is-succeeded");
+            if (response === "あとで見るに登録しました" || response === "マイリストに登録しました") button.classList.add("is-succeeded");
             else button.classList.add("is-failed");
 
             button.dataset.title = response;
