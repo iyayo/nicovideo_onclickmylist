@@ -164,7 +164,7 @@ function setStorage() {
         if (selected.length !== 0) {
             chrome.action.setBadgeBackgroundColor({color: "#26a69a"});
             if (options.badgeMylistName.checked) chrome.action.setBadgeText({"text": String(selected[0].dataset.name)});
-            else  chrome.browserAction.setBadgeText({"text": String(selected[0].dataset.num)});
+            else  chrome.action.setBadgeText({"text": String(selected[0].dataset.num)});
 
             data.nvocm_id = selected[0].dataset.id;
             data.nvocm_name = selected[0].dataset.name;
