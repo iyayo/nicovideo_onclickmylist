@@ -11,10 +11,16 @@ const prop = {
 let notificationSound = false;
 let clearNotificationsTime = "disable";
 
-chrome.storage.local.get(["nvocm_notificationSound", "nvocm_clearNotificationsTime"], item => {
-    if (item.nvocm_notificationSound !== undefined) notificationSound = item.nvocm_notificationSound;
-    if (item.nvocm_clearNotificationsTime !== undefined) clearNotificationsTime = item.nvocm_clearNotificationsTime;
-})
+chrome.runtime.onStartup.addListener(() => {
+    chrome.storage.local.get(["nvocm_notificationSound", "nvocm_clearNotificationsTime", "nvocm_name"], item => {
+        if (item.nvocm_notificationSound !== undefined) notificationSound = item.nvocm_notificationSound;
+        if (item.nvocm_clearNotificationsTime !== undefined) clearNotificationsTime = item.nvocm_clearNotificationsTime;
+        if (item.nvocm_name !== undefined) {
+            chrome.action.setBadgeBackgroundColor({color: "#26a69a"});
+            chrome.action.setBadgeText({"text": item.nvocm_name})
+        };
+    })
+});
 
 chrome.storage.local.onChanged.addListener(item => {
     if (item.nvocm_notificationSound) notificationSound = item.nvocm_notificationSound.newValue;
