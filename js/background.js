@@ -1,12 +1,15 @@
 const regexVideoId = /https:\/\/www\.nicovideo\.jp\/watch\/(..\d+)/;
 
-const prop = {
-    type: "normal",
-    id: "onclick_mylist",
-    title: "マイリストに登録",
-    contexts: ["link"],
-    targetUrlPatterns: ["*://www.nicovideo.jp/watch/*"]
-};
+chrome.runtime.onInstalled.addListener(() => {
+    chrome.contextMenus.removeAll()
+    chrome.contextMenus.create({
+        type: "normal",
+        id: "onclick_mylist",
+        title: "マイリストに登録",
+        contexts: ["link"],
+        targetUrlPatterns: ["*://www.nicovideo.jp/watch/*"]
+    })
+});
 
 let notificationSound = false;
 let clearNotificationsTime = "disable";
@@ -27,7 +30,6 @@ chrome.storage.local.onChanged.addListener(item => {
     if (item.nvocm_clearNotificationsTime) clearNotificationsTime = item.nvocm_clearNotificationsTime.newValue;
 });
 
-chrome.contextMenus.create(prop);
 chrome.contextMenus.onClicked.addListener((info) => {
     const videoId = info.linkUrl.match(regexVideoId)[1];
 
