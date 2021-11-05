@@ -1,4 +1,6 @@
 const regexVideoId = /https:\/\/www\.nicovideo\.jp\/watch\/(..\d+)/;
+let notificationSound = false;
+let clearNotificationsTime = "disable";
 
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.removeAll()
@@ -10,9 +12,6 @@ chrome.runtime.onInstalled.addListener(() => {
         targetUrlPatterns: ["*://www.nicovideo.jp/watch/*"]
     })
 });
-
-let notificationSound = false;
-let clearNotificationsTime = "disable";
 
 chrome.runtime.onStartup.addListener(() => {
     chrome.storage.local.get(["nvocm_notificationSound", "nvocm_clearNotificationsTime", "nvocm_name"], item => {
@@ -109,7 +108,6 @@ function addMylist(mylistId, videoId, description) {
             "credentials": "include"
         })
         .then(res => {
-            console.log(res);
             if (res.status === 201) resolve("マイリストに登録しました");
             else if (res.status === 200) resolve("マイリストに登録済みです");
             else resolve("登録に失敗しました");
