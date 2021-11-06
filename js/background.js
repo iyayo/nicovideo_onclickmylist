@@ -2,6 +2,11 @@ const regexVideoId = /https:\/\/www\.nicovideo\.jp\/watch\/(..\d+)/;
 let notificationSound = false;
 let clearNotificationsTime = false;
 
+chrome.storage.local.get(["nvocm_notificationSound", "nvocm_clearNotificationsTime"], item => {
+    if (item.nvocm_notificationSound !== undefined) notificationSound = item.nvocm_notificationSound;
+    if (item.nvocm_clearNotificationsTime !== undefined) clearNotificationsTime = item.nvocm_clearNotificationsTime;
+})
+
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.removeAll()
     chrome.contextMenus.create({
@@ -19,14 +24,12 @@ chrome.runtime.onInstalled.addListener(() => {
         else if (item.nvocm_clearNotificationsTime === "5000" || item.nvocm_clearNotificationsTime === "7000" || item.nvocm_clearNotificationsTime === "15000") isChecked = true;
         else return;
         
-        chrome.storage.local.set({"nvocm_clearNotificationsTime": isChecked})
+        chrome.storage.local.set({"nvocm_clearNotificationsTime": isChecked}, () => clearNotificationsTime = isChecked)
     })
 });
 
 chrome.runtime.onStartup.addListener(() => {
-    chrome.storage.local.get(["nvocm_notificationSound", "nvocm_clearNotificationsTime", "nvocm_name"], item => {
-        if (item.nvocm_notificationSound !== undefined) notificationSound = item.nvocm_notificationSound;
-        if (item.nvocm_clearNotificationsTime !== undefined) clearNotificationsTime = item.nvocm_clearNotificationsTime;
+    chrome.storage.local.get(["nvocm_name"], item => {
         if (item.nvocm_name !== undefined) {
             chrome.action.setBadgeBackgroundColor({color: "#26a69a"});
             chrome.action.setBadgeText({"text": item.nvocm_name})
