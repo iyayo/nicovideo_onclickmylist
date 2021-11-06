@@ -65,10 +65,6 @@ Promise.resolve()
         if (mylistSelect.children[i].dataset.id === item.nvocm_id) mylistSelect.children[i].className = "selected";
     }
 
-    for (let i = 0; i < options.clearNotificationsTime.options.length; i++) {
-        if (options.clearNotificationsTime.options[i].value === item.nvocm_clearNotificationsTime) options.clearNotificationsTime.options[i].selected = true;
-    }
-
     if (item.nvocm_selectSize !== undefined && item.nvocm_selectSize > 1 && item.nvocm_selectSize < 11) {
         mylistSelect.style.height = item.nvocm_selectSize * selectHeight + "px";
     }
@@ -77,6 +73,7 @@ Promise.resolve()
     if (item.nvocm_selectSize !== undefined) options.selectSize.value = item.nvocm_selectSize;
     if (item.nvocm_autoClose !== undefined) options.autoClose.checked = item.nvocm_autoClose;
     if (item.nvocm_notificationSound !== undefined) options.notificationSound.checked = item.nvocm_notificationSound;
+    if (item.nvocm_clearNotificationsTime !== undefined) options.clearNotificationsTime.checked = item.nvocm_clearNotificationsTime;
     if (item.nvocm_badgeMylistName !== undefined) options.badgeMylistName.checked = item.nvocm_badgeMylistName;
 })
 .then(setStatusText)
@@ -157,7 +154,7 @@ function setStorage() {
             nvocm_selectSize: options.selectSize.value,
             nvocm_autoClose: options.autoClose.checked,
             nvocm_notificationSound: options.notificationSound.checked,
-            nvocm_clearNotificationsTime: options.clearNotificationsTime.value,
+            nvocm_clearNotificationsTime: options.clearNotificationsTime.checked,
             nvocm_badgeMylistName: options.badgeMylistName.checked
         }
 

@@ -234,11 +234,6 @@ input[type="checkbox"]:checked + label > div {
     transform: translateX(17px);
 }
 
-select[name="clearNotificationsTime"] {
-    padding: 5px;
-    outline: none;
-}
-
 #statusMenu {
     display: flex;
     flex-direction: row;

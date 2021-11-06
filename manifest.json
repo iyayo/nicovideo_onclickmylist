@@ -40,7 +40,8 @@
     "contextMenus",
     "notifications",
     "storage",
-    "declarativeNetRequest"
+    "declarativeNetRequest",
+    "alarms"
   ],
   "host_permissions": [
     "*://*.nicovideo.jp/*"

@@ -1,6 +1,6 @@
 const regexVideoId = /https:\/\/www\.nicovideo\.jp\/watch\/(..\d+)/;
 let notificationSound = false;
-let clearNotificationsTime = "disable";
+let clearNotificationsTime = false;
 
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.removeAll()
@@ -10,6 +10,16 @@ chrome.runtime.onInstalled.addListener(() => {
         title: "マイリストに登録",
         contexts: ["link"],
         targetUrlPatterns: ["*://www.nicovideo.jp/watch/*"]
+    })
+
+    chrome.storage.local.get(["nvocm_clearNotificationsTime"], item => {
+        let isChecked;
+
+        if (item.nvocm_clearNotificationsTime === "disable") isChecked = false;
+        else if (item.nvocm_clearNotificationsTime === "5000" || item.nvocm_clearNotificationsTime === "7000" || item.nvocm_clearNotificationsTime === "15000") isChecked = true;
+        else return;
+        
+        chrome.storage.local.set({"nvocm_clearNotificationsTime": isChecked})
     })
 });
 
@@ -59,6 +69,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 
     return true;
+})
+
+chrome.alarms.onAlarm.addListener(alarm => {
+    chrome.notifications.clear(alarm.name);
 })
 
 function checkUserSession(){
@@ -127,9 +141,7 @@ function createNotification(res, silent, clear) {
     NotificationOptions.message = res;
 
     chrome.notifications.create(NotificationOptions, notificationId => {
-        if (clear === "disable") return;
-        setTimeout(() => {
-            chrome.notifications.clear(notificationId);
-        }, clear);
+        if (!clear) return;
+        chrome.alarms.create(notificationId, {"delayInMinutes": 1})
     });
 }
