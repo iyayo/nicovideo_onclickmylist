@@ -8,6 +8,6 @@
           { "header": "Origin", "operation": "set", "value": "https://www.nicovideo.jp" }
         ]
       },
-      "condition": { "urlFilter": "https://nvapi.nicovideo.jp/v1/users/me/*", "resourceTypes": ["xmlhttprequest"] }
+      "condition": { "urlFilter": "https://nvapi.nicovideo.jp/v1/users/me/*", "resourceTypes": ["xmlhttprequest"], "excludedDomains": ["www.upload.nicovideo.jp"]}
     }
   ]
