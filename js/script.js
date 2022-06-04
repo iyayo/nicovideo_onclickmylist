@@ -2,7 +2,7 @@ window.onload = function () {
     let name = "ワンクリックマイリスト";
 
     const parentNode = document.querySelector(".VideoMenuContainer-areaLeft");
-    const referenceNode = document.querySelector("span.VideoMenuGiftContainer").nextSibling;
+    const referenceNode = document.querySelector("section.VideoMenuLikeFieldContainer").nextSibling;
     const div = document.createElement("div");
     div.className = "ClickInterceptor LoginRequirer is-inline";
 
