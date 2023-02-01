@@ -1,6 +1,7 @@
 const regexVideoId = /https:\/\/www\.nicovideo\.jp\/watch\/(..\d+)/;
 let notificationSound = false;
 let clearNotificationsTime = false;
+let match_itemId = "";
 
 chrome.storage.local.get(["nvocm_notificationSound", "nvocm_clearNotificationsTime"], item => {
     if (item.nvocm_notificationSound !== undefined) notificationSound = item.nvocm_notificationSound;
@@ -48,10 +49,7 @@ chrome.contextMenus.onClicked.addListener((info) => {
     Promise.resolve()
     .then(() => checkUserSession())
     .then(() => getStorageFormData())
-    .then(item => {
-        if (item[0] === "watchlater") return addWatchLater(videoId, encodeURIComponent(item[1]));
-        else return addMylist(item[0], videoId, encodeURIComponent(item[1]));
-    })
+    .then(item => addMylist(item[0], videoId, encodeURIComponent(item[1])))
     .then(res => createNotification(res, notificationSound, clearNotificationsTime))
     .catch(error => createNotification(error, notificationSound, clearNotificationsTime))
 });
@@ -63,10 +61,27 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         Promise.resolve()
         .then(() => checkUserSession())
         .then(() => getStorageFormData())
-        .then(item => {
-            if (item[0] === "watchlater") return addWatchLater(videoId, encodeURIComponent(item[1]));
-            else  return addMylist(item[0], videoId, encodeURIComponent(item[1]));
+        .then(item => addMylist(item[0], videoId, encodeURIComponent(item[1])))
+        .then(res => sendResponse(res))
+        .catch(error => sendResponse(error))
+    } else if (request.message === "checkMylist") {
+        const videoId = sender.tab.url.match(regexVideoId)[1];
+
+        Promise.resolve()
+        .then(() => checkUserSession())
+        .then(() => getStorageFormData())
+        .then(item => getMylistInfo(item[0], videoId))
+        .then(res => {
+            if (res) sendResponse(true);
+            else sendResponse(false);
         })
+    }
+
+    else if (request.message === "deleteMylist") {
+        Promise.resolve()
+        .then(() => checkUserSession())
+        .then(() => getStorageFormData())
+        .then(item => deleteMylist(item[0], match_itemId))
         .then(res => sendResponse(res))
         .catch(error => sendResponse(error))
     }
@@ -96,40 +111,124 @@ function getStorageFormData() {
     })
 }
 
-function addWatchLater(videoId, description) {
+function addMylist(mylistId, videoId, description) {
     return new Promise ((resolve, reject) => {
-        fetch(`https://nvapi.nicovideo.jp/v1/users/me/watch-later?watchId=${videoId}&memo=${description}`, {
+        if (mylistId == "watchlater") {
+            fetch(`https://nvapi.nicovideo.jp/v1/users/me/watch-later?watchId=${videoId}&memo=${description}`, {
             "headers": {
                 "x-frontend-id": "23",
                 "x-request-with": "N-garage"
             },
             "method": "POST",
             "credentials": "include"
-        })
-        .then(res => {
-            if (res.status === 201) resolve("あとで見るに登録しました");
-            else if (res.status === 409) resolve("あとで見るに登録済みです");
-            else resolve("登録に失敗しました");
-        })
+            })
+            .then(res => {
+                if (res.status === 201) resolve("あとで見るに登録しました");
+                else if (res.status === 409) resolve("あとで見るに登録済みです");
+                else resolve("登録に失敗しました");
+            })
+        } else {
+            fetch(`https://nvapi.nicovideo.jp/v1/users/me/mylists/${mylistId}/items?itemId=${videoId}&description=${description}`, {
+                "headers": {
+                    "x-frontend-id": "23",
+                    "x-request-with": "N-garage"
+                },
+                "method": "POST",
+                "credentials": "include"
+            })
+            .then(res => {
+                if (res.status === 201) resolve("マイリストに登録しました");
+                else if (res.status === 200) resolve("マイリストに登録済みです");
+                else resolve("登録に失敗しました");
+            })
+        }
     })
 }
 
-function addMylist(mylistId, videoId, description) {
+function deleteMylist(mylistId, itemId) {
     return new Promise ((resolve, reject) => {
-        fetch(`https://nvapi.nicovideo.jp/v1/users/me/mylists/${mylistId}/items?itemId=${videoId}&description=${description}`, {
-            "headers": {
-                "x-frontend-id": "23",
-                "x-request-with": "N-garage"
-            },
-            "method": "POST",
-            "credentials": "include"
-        })
-        .then(res => {
-            if (res.status === 201) resolve("マイリストに登録しました");
-            else if (res.status === 200) resolve("マイリストに登録済みです");
-            else resolve("登録に失敗しました");
-        })
+        if (mylistId == "watchlater") {
+            fetch(`https://nvapi.nicovideo.jp/v1/users/me/watch-later?itemIds=${itemId}`, {
+                "headers": {
+                    "x-frontend-id": "23",
+                    "x-request-with": "N-garage"
+                },
+                "method": "DELETE",
+                "credentials": "include"
+            })
+            .then(res => {
+                if (res.status === 200) resolve("マイリストから削除しました");
+                else resolve("削除に失敗しました");
+            })
+        } else {
+            fetch(`https://nvapi.nicovideo.jp/v1/users/me/mylists/${mylistId}/items?itemIds=${itemId}`, {
+                "headers": {
+                    "x-frontend-id": "23",
+                    "x-request-with": "N-garage"
+                },
+                "method": "DELETE",
+                "credentials": "include"
+            })
+            .then(res => {
+                if (res.status === 200) resolve("マイリストから削除しました");
+                else resolve("削除に失敗しました");
+            })
+        }
     })
+}
+
+async function getMylistInfo(id, videoId) {
+    let hasNext = true;
+    let match = false;
+    match_itemId = "";
+
+    for (let page = 1; hasNext && !match && page < 6; page++){
+        await myFunc(page, id, videoId);
+    }
+
+    return match;
+
+    async function myFunc(page, id, videoId) {
+        return new Promise((resolve) => {
+            if (id === "watchlater") {
+                fetch(`https://nvapi.nicovideo.jp/v1/users/me/watch-later?sortKey=addedAt&sortOrder=desc&pageSize=100&page=${page}`, { "headers": { "x-frontend-id": "6" }, "method": "GET" })
+                .then(response => response.json())
+                .then(obj => obj.data.watchLater)
+                .then(mylist => {
+                    hasNext = mylist.hasNext;
+    
+                    for (let i = 0; i < mylist.items.length; i++) {
+                        const item = mylist.items[i];
+    
+                        if (item.watchId == videoId) {
+                            match = true;
+                            match_itemId = item.itemId;
+                        } 
+                    }
+    
+                    resolve();
+                })
+            } else {
+                fetch("https://nvapi.nicovideo.jp/v1/users/me/mylists/" + id + `?page=${page}&pageSize=100`, { "headers": { "x-frontend-id": "6" }, "method": "GET" })
+                .then(response => response.json())
+                .then(obj => obj.data.mylist)
+                .then(mylist => {
+                    hasNext = mylist.hasNext;
+    
+                    for (let i = 0; i < mylist.items.length; i++) {
+                        const item = mylist.items[i];
+    
+                        if (item.watchId == videoId) {
+                            match = true;
+                            match_itemId = item.itemId;
+                        } 
+                    }
+    
+                    resolve();
+                })
+            }
+        });
+    }
 }
 
 function createNotification(res, silent, clear) {
