@@ -1,8 +1,35 @@
 body {
-    width: 700px;
+    width: 800px;
     height: 600px;
+    overflow: hidden;
 }
 
 #mylistSelect {
     max-height: 530px;
+}
+
+#mylistObjectList {
+    height: 450px;
+    overflow-y: auto;
+}
+
+.mylistItemsCount {
+    pointer-events: none;
+}
+
+#mylistObject-videoLength {
+    bottom: 2px;
+    right: 16px;
+    background-color: rgba(0,0,0,.5);
+}
+
+#mylistObject-bodyTitle {
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+#mylistObject-url:hover #mylistObject-bodyTitle {
+    color: #0080ff !important;
 }

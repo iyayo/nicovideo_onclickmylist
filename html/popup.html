@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/css/popup.css">
     <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
     <title>ニコニコ動画 ワンクリックマイリスト</title>
 </head>
 
@@ -32,7 +33,7 @@
             </div>
         </nav>
     </header>
-    
+
 
     <div class="container-fluid">
 
@@ -41,8 +42,8 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
-        <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="nav-mylists" role="tabpanel" aria-labelledby="nav-mylists-tab">
+        <div class="row">
+            <div class="col-4">
                 <div class="card card-scroll overflow-auto">
                     <ul id="mylistSelect" class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between align-items-center"
@@ -55,59 +56,107 @@
                 </div>
             </div>
 
-            <div class="tab-pane fade" id="nav-memo" role="tabpanel" aria-labelledby="nav-memo-tab">
-                <div class="mb-1">
-                    <textarea name="mylistMemo" id="memo" class="form-control" cols="30" rows="10" maxlength="256"
-                        placeholder="省略可"></textarea>
-                </div>
+            <div class="col">
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="nav-mylists" role="tabpanel"
+                        aria-labelledby="nav-mylists-tab">
 
-                <div class="text-center">
-                    文字数：<span id="memoLength">0</span> / 256
-                    <button id="memoClearButton" class="btn btn-primary btn-sm">クリア</button>
-                </div>
-            </div>
+                        <div id="mylistContainer">
+                            <header>
+                                <h1 id="mylistName" class="fs-5 fw-bold mt-3"></h1>
+                                <hr class="my-2">
+                            </header>
 
-            <div class="tab-pane fade" id="nav-options" role="tabpanel" aria-labelledby="nav-options-tab">
-                <div class="row">
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="card-header">右クリックメニュー</div>
-                            <div class="card-body">
-                                <form name="options">
-                                    <div class="form-check form-switch">
-                                        <input type="checkbox" name="notificationSound" id="notificationSound"
-                                            class="form-check-input">
-                                        <label class="form-check-label" for="notificationSound">通知音を消す</label>
+                            <div id="mylistObjectList">
+                                <div id="mylistObject-main" class="card border-0">
+                                    <div class="row g-0">
+                                        <div class="col-11">
+                                            <a id="mylistObject-url" href="#"
+                                                class="row text-decoration-none" target="_blank">
+                                                <div class="col position-relative" style="width: 144px;">
+                                                    <img id="mylistObject-thumbnail"
+                                                        src=""
+                                                        class="rounded img-fluid border"
+                                                        style="width: 144px;  height: 78px; object-fit: cover;">
+                                                    
+                                                    <small><div id="mylistObject-videoLength" class="position-absolute rounded text-white px-1"></div></small>
+                                                </div>
+                                                <div class="col-8 g-0">
+                                                    <div class="card-body p-1">
+                                                        <h2 id="mylistObject-bodyTitle" class="card-title fs-6 lh-1 text-body align-baseline"></h2>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </div>
+
+
+
+                                        <small><div id="mylistObject-memo" class="bg-light mt-2 p-2 d-none"></div></small>
                                     </div>
-                                    <div class="form-check form-switch">
-                                        <input type="checkbox" name="clearNotificationsTime" id="clearNotificationsTime"
-                                            class="form-check-input">
-                                        <label class="form-check-label"
-                                            for="clearNotificationsTime">通知の自動消去（1分後）</label>
-                                    </div>
-                                </form>
+                                    <hr class="my-2">
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col">
-                        <div class="card h-100">
-                            <div class="card-header">お問い合わせ</div>
-                            <div class="card-body">
-                                <p class="card-text">質問・不具合・要望などはサポートからどうぞ。</p>
-                                <a href="https://chrome.google.com/webstore/detail/%E3%83%8B%E3%82%B3%E3%83%8B%E3%82%B3%E5%8B%95%E7%94%BB-%E3%83%AF%E3%83%B3%E3%82%AF%E3%83%AA%E3%83%83%E3%82%AF%E3%83%9E%E3%82%A4%E3%83%AA%E3%82%B9%E3%83%88/majibbkdipkpbikeejejgoinbgbdmdhf?hl=ja&authuser=0"
-                                    class="btn btn-primary" target="_blank">サポートを開く</a>
+                    <div class="tab-pane fade" id="nav-memo" role="tabpanel" aria-labelledby="nav-memo-tab">
+                        <div class="mb-1">
+                            <textarea name="mylistMemo" id="memo" class="form-control" cols="30" rows="10"
+                                maxlength="256" placeholder="省略可"></textarea>
+                        </div>
+
+                        <div class="text-center">
+                            文字数：<span id="memoLength">0</span> / 256
+                            <button id="memoClearButton" class="btn btn-primary btn-sm">クリア</button>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="nav-options" role="tabpanel" aria-labelledby="nav-options-tab">
+                        <div class="row">
+                            <div class="col">
+                                <div class="card h-100">
+                                    <div class="card-header">右クリックメニュー</div>
+                                    <div class="card-body">
+                                        <form name="options">
+                                            <div class="form-check form-switch">
+                                                <input type="checkbox" name="notificationSound" id="notificationSound"
+                                                    class="form-check-input">
+                                                <label class="form-check-label" for="notificationSound">通知音を消す</label>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input type="checkbox" name="clearNotificationsTime"
+                                                    id="clearNotificationsTime" class="form-check-input">
+                                                <label class="form-check-label"
+                                                    for="clearNotificationsTime">通知の自動消去（1分後）</label>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <div class="card h-100">
+                                    <div class="card-header">お問い合わせ</div>
+                                    <div class="card-body">
+                                        <p class="card-text">質問・不具合・要望などはサポートからどうぞ。</p>
+                                        <a href="https://chrome.google.com/webstore/detail/%E3%83%8B%E3%82%B3%E3%83%8B%E3%82%B3%E5%8B%95%E7%94%BB-%E3%83%AF%E3%83%B3%E3%82%AF%E3%83%AA%E3%83%83%E3%82%AF%E3%83%9E%E3%82%A4%E3%83%AA%E3%82%B9%E3%83%88/majibbkdipkpbikeejejgoinbgbdmdhf?hl=ja&authuser=0"
+                                            class="btn btn-primary" target="_blank">サポートを開く</a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+
+
     </div>
 
     <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="/js/popup.js"></script>
-    
+
 </body>
 
 </html>
