@@ -1,71 +1,113 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/css/popup.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
     <title>ニコニコ動画 ワンクリックマイリスト</title>
 </head>
-<body>
-    <div id="container">
-        <nav>
-            <ul id="navigation">
-                <li data-nav="mylistMenu">マイリスト</li>
-                <li data-nav="memoMenu">メモ</li>
-                <li data-nav="optionMenu">オプション</li>
-            </ul>
-        </nav>
 
-        <div id="mainMenu">
-            <div id="mylistMenu">
-                <ul id="mylistSelect">
-                    <li data-id="watchlater" data-num="1" data-name="あとで見る" data-description="" data-url="https://www.nicovideo.jp/my/watchlater"><span class="mylistNum">1.</span><span class="mylistName">あとで見る</span><span id="watchlaterItemsCount" class="mylistItemsCount"></span></li>
-                </ul>
-            </div>
-            <div id="memoMenu">
-                <textarea name="mylistMemo" id="memo" cols="30" rows="10" maxlength="256" placeholder="省略可"></textarea>
-                <div id="memoCountMenu">
-                    <div id="memoCount">
-                        <span>文字数：</span>
-                        <span id="memoLength">0</span>
-                        <span> / 256</span>
+<body>
+    <header>
+        <nav class="navbar navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <img src="/icon/icon32.png" alt="Logo" width="32" height="32" class="d-inline-block align-text-top">
+                    ワンクリックマイリスト
+                </a>
+                <nav>
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                        <button type="button" class="nav-link active" id="nav-mylists-tab" data-bs-toggle="tab"
+                            data-bs-target="#nav-mylists" type="button" role="tab" aria-controls="nav-mylists"
+                            aria-selected="true">マイリスト</button>
+                        <button type="button" class="nav-link" id="nav-memo-tab" data-bs-toggle="tab"
+                            data-bs-target="#nav-memo" type="button" role="tab" aria-controls="nav-memo"
+                            aria-selected="false">メモ</button>
+                        <button type="button" class="nav-link" id="nav-options-tab" data-bs-toggle="tab"
+                            data-bs-target="#nav-options" type="button" role="tab" aria-controls="nav-options"
+                            aria-selected="false">オプション</button>
                     </div>
-                    <button id="memoClearButton">クリア</button>
+                </nav>
+            </div>
+        </nav>
+    </header>
+    
+
+    <div class="container-fluid">
+
+        <div id="alertContainer" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+            <p id="alertMessage"></p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="nav-mylists" role="tabpanel" aria-labelledby="nav-mylists-tab">
+                <div class="card card-scroll overflow-auto">
+                    <ul id="mylistSelect" class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center"
+                            data-id="watchlater" data-num="1" data-name="あとで見る" data-description=""
+                            data-url="https://www.nicovideo.jp/my/watchlater">あとで見る
+                            <span id="watchlaterItemsCount"
+                                class="mylistItemsCount badge bg-primary rounded-pill"></span>
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <div id="optionMenu">
-                <form name="options">
-                    <div class="optionItem">
-                        <span class="optionName">マイリストの行数（下限2・上限10）</span>
-                        <div class="optionValue"><input type="number" name="selectSize" value="7" min="2" max="10"></div>
-                    </div>
-                    <div class="optionItem">
-                        <span class="optionName">保存を押したときに自動でポップアップを閉じる</span>
-                        <div class="optionValue"><input type="checkbox" name="autoClose" id="autoClose"><label for="autoClose"><div></div></label></div>
-                    </div>
-                    <div class="optionItem">
-                        <span class="optionName">通知音を消す</span>
-                        <div class="optionValue"><input type="checkbox" name="notificationSound" id="notificationSound"><label for="notificationSound"><div></div></label></div>
-                    </div>
-                    <div class="optionItem">
-                        <span class="optionName">通知の自動消去（1分後）</span>
-                        <div class="optionValue"><input type="checkbox" name="clearNotificationsTime" id="clearNotificationsTime"><label for="clearNotificationsTime"><div></div></label></div>
+
+            <div class="tab-pane fade" id="nav-memo" role="tabpanel" aria-labelledby="nav-memo-tab">
+                <div class="mb-1">
+                    <textarea name="mylistMemo" id="memo" class="form-control" cols="30" rows="10" maxlength="256"
+                        placeholder="省略可"></textarea>
+                </div>
+
+                <div class="text-center">
+                    文字数：<span id="memoLength">0</span> / 256
+                    <button id="memoClearButton" class="btn btn-primary btn-sm">クリア</button>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="nav-options" role="tabpanel" aria-labelledby="nav-options-tab">
+                <div class="row">
+                    <div class="col">
+                        <div class="card h-100">
+                            <div class="card-header">右クリックメニュー</div>
+                            <div class="card-body">
+                                <form name="options">
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" name="notificationSound" id="notificationSound"
+                                            class="form-check-input">
+                                        <label class="form-check-label" for="notificationSound">通知音を消す</label>
+                                    </div>
+                                    <div class="form-check form-switch">
+                                        <input type="checkbox" name="clearNotificationsTime" id="clearNotificationsTime"
+                                            class="form-check-input">
+                                        <label class="form-check-label"
+                                            for="clearNotificationsTime">通知の自動消去（1分後）</label>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="optionItem">
-                        <span class="optionName">バッジの表記をマイリスト名にする（文字数制限あり）</span>
-                        <div class="optionValue"><input type="checkbox" name="badgeMylistName" id="badgeMylistName"><label for="badgeMylistName"><div></div></label></div>
+                    <div class="col">
+                        <div class="card h-100">
+                            <div class="card-header">お問い合わせ</div>
+                            <div class="card-body">
+                                <p class="card-text">質問・不具合・要望などはサポートからどうぞ。</p>
+                                <a href="https://chrome.google.com/webstore/detail/%E3%83%8B%E3%82%B3%E3%83%8B%E3%82%B3%E5%8B%95%E7%94%BB-%E3%83%AF%E3%83%B3%E3%82%AF%E3%83%AA%E3%83%83%E3%82%AF%E3%83%9E%E3%82%A4%E3%83%AA%E3%82%B9%E3%83%88/majibbkdipkpbikeejejgoinbgbdmdhf?hl=ja&authuser=0"
+                                    class="btn btn-primary" target="_blank">サポートを開く</a>
+                            </div>
+                        </div>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
-
-        <div id="statusMenu">
-            <span>選択中：</span>
-            <a id="statusLink" target="_blank"><span id="statusText"></span></a>
-        </div>
-        
-        <button id="saveButton">保存</button>
     </div>
+
+    <script src="/js/bootstrap.bundle.min.js"></script>
     <script src="/js/popup.js"></script>
+    
 </body>
+
 </html>

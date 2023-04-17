@@ -32,7 +32,8 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.runtime.onStartup.addListener(() => {
     chrome.storage.local.get(["nvocm_name"], item => {
         if (item.nvocm_name !== undefined) {
-            chrome.action.setBadgeBackgroundColor({color: "#26a69a"});
+            chrome.action.setBadgeBackgroundColor({color: "#0080ff"});
+            chrome.action.setBadgeTextColor({color: "#fff"});
             chrome.action.setBadgeText({"text": item.nvocm_name})
         };
     })

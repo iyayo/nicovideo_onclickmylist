@@ -1,29 +1,18 @@
-const navigation = document.getElementById("navigation");
-const mainMenu = document.querySelectorAll("div#mainMenu > div");
 const mylistSelect = document.getElementById("mylistSelect");
 const watchlaterItemsCount = document.getElementById("watchlaterItemsCount");
-const selected = mylistSelect.getElementsByClassName("selected");
-const selectHeight = 50;
+const selected = mylistSelect.getElementsByClassName("active");
 const memo = document.getElementById("memo");
 const memoClearButton = document.getElementById("memoClearButton");
-const saveButton = document.getElementById("saveButton");
 const options = document.forms["options"];
-
-navigation.addEventListener("click", e => {
-    if (e.target.tagName !== "LI") return;
-    mainMenu.forEach(m => {
-        if (e.target.dataset.nav === m.id) m.style.display = "block";
-        else m.style.display = "none";
-    })
-})
 
 mylistSelect.addEventListener("click", e => {
     for (let i = 0; i < mylistSelect.children.length; i++) {
-        mylistSelect.children[i].className = "";
+        mylistSelect.children[i].classList.remove("active");
     }
 
-    e.target.className = "selected";
-    setStatusText();
+    e.target.classList.add("active");
+    Promise.resolve()
+    .then(setStorage)
 });
 
 memo.addEventListener("input", countMemoLength);
@@ -33,28 +22,7 @@ memoClearButton.addEventListener("click", () => {
     countMemoLength();
 });
 
-options.selectSize.addEventListener("change", e => mylistSelect.style.height = e.target.value * selectHeight + "px");
-
-saveButton.addEventListener("click", () => {
-    Promise.resolve()
-    .then(setStorage)
-    .then(() => {
-        if (options.autoClose.checked) window.close();
-
-        saveButton.className = "complete";
-        saveButton.style.width = "116px";
-        
-        setTimeout(() => {
-            saveButton.innerText = "保存しました";
-        }, 150);
-    
-        setTimeout(() => {
-            saveButton.className = "";
-            saveButton.style.width = "58px";
-            saveButton.innerText = "保存";
-        }, 2000);
-    })
-})
+options.addEventListener("change", setStorage);
 
 Promise.resolve()
 .then(checkUserSession)
@@ -62,25 +30,15 @@ Promise.resolve()
 .then(getStorage)
 .then(item => {
     for (let i = 0; i < mylistSelect.children.length; i++) {
-        if (mylistSelect.children[i].dataset.id === item.nvocm_id) mylistSelect.children[i].className = "selected";
-    }
-
-    if (item.nvocm_selectSize !== undefined && item.nvocm_selectSize > 1 && item.nvocm_selectSize < 11) {
-        mylistSelect.style.height = item.nvocm_selectSize * selectHeight + "px";
+        if (mylistSelect.children[i].dataset.id === item.nvocm_id) mylistSelect.children[i].classList.add("active");
     }
 
     if (item.nvocm_desc !== undefined) memo.value = item.nvocm_desc;
-    if (item.nvocm_selectSize !== undefined) options.selectSize.value = item.nvocm_selectSize;
-    if (item.nvocm_autoClose !== undefined) options.autoClose.checked = item.nvocm_autoClose;
     if (item.nvocm_notificationSound !== undefined) options.notificationSound.checked = item.nvocm_notificationSound;
     if (item.nvocm_clearNotificationsTime !== undefined) options.clearNotificationsTime.checked = item.nvocm_clearNotificationsTime;
-    if (item.nvocm_badgeMylistName !== undefined) options.badgeMylistName.checked = item.nvocm_badgeMylistName;
 })
-.then(setStatusText)
 .then(countMemoLength)
-.catch(error => {
-    mainMenu[0].innerHTML = `<div id="errorMessage">${error}</div>`;
-})
+.catch(showAlert)
 
 function checkUserSession(){
     return new Promise((resolve,reject) => {
@@ -102,26 +60,19 @@ function getMylist() {
         .then(response => response.json())
         .then(obj => obj.data.mylists)
         .then(arr => {
-            console.log(arr);
             for (let i = 0; i < arr.length; i++) {
                 const mylistOption = document.createElement("li");
-                const mylistNum = document.createElement("span");
-                const mylistName = document.createElement("span");
-                const mylistItemsCount = document.createElement("span"); 
-                mylistNum.className = "mylistNum";
-                mylistNum.innerText = i + 2 + ".";
-                mylistName.className = "mylistName";
-                mylistName.innerText = arr[i].name;
-                mylistItemsCount.className = "mylistItemsCount";
+                const mylistItemsCount = document.createElement("span");
+                mylistOption.innerText = arr[i].name;
+                mylistItemsCount.className = "mylistItemsCount badge bg-primary rounded-pill";
                 mylistItemsCount.innerText = arr[i].itemsCount;
+                mylistOption.className = "list-group-item d-flex justify-content-between align-items-center";
                 mylistOption.dataset.id = arr[i].id;
                 mylistOption.dataset.num = i + 2;
                 mylistOption.dataset.name = arr[i].name;
                 mylistOption.dataset.description = arr[i].description;
                 mylistOption.dataset.url = "https://www.nicovideo.jp/my/mylist/" + arr[i].id;
                 mylistSelect.appendChild(mylistOption);
-                mylistOption.appendChild(mylistNum);
-                mylistOption.appendChild(mylistName);
                 mylistOption.appendChild(mylistItemsCount);
             }
             resolve();
@@ -134,34 +85,25 @@ function countMemoLength() {
     const count = memo.value.length;
     memoLength.innerText = count;
 
+    Promise.resolve()
+    .then(setStorage)
+
     if (count === 256) memoLength.style.color = "red";
     else memoLength.style.color = "";
-}
-
-function setStatusText () {
-    if (selected.length === 0) return;
-    const statusText = document.getElementById("statusText");
-    const statusLink = document.getElementById("statusLink");
-
-    statusText.innerText = selected[0].dataset.name;
-    statusLink.href = selected[0].dataset.url;
 }
 
 function setStorage() {
     return new Promise((resolve, reject) => {
         const data = {
             nvocm_desc: memo.value,
-            nvocm_selectSize: options.selectSize.value,
-            nvocm_autoClose: options.autoClose.checked,
             nvocm_notificationSound: options.notificationSound.checked,
-            nvocm_clearNotificationsTime: options.clearNotificationsTime.checked,
-            nvocm_badgeMylistName: options.badgeMylistName.checked
+            nvocm_clearNotificationsTime: options.clearNotificationsTime.checked
         }
 
         if (selected.length !== 0) {
-            chrome.action.setBadgeBackgroundColor({color: "#26a69a"});
-            if (options.badgeMylistName.checked) chrome.action.setBadgeText({"text": String(selected[0].dataset.name)});
-            else  chrome.action.setBadgeText({"text": String(selected[0].dataset.num)});
+            chrome.action.setBadgeBackgroundColor({color: "#0080ff"});
+            chrome.action.setBadgeTextColor({color: "#fff"});
+            chrome.action.setBadgeText({"text": String(selected[0].dataset.name)});
 
             data.nvocm_id = selected[0].dataset.id;
             data.nvocm_name = selected[0].dataset.name;
@@ -175,4 +117,12 @@ function getStorage() {
     return new Promise((resolve, reject) => {
         chrome.storage.local.get(null, item => resolve(item));
     })
+}
+
+function showAlert(message) {
+    const alertContainer = document.getElementById("alertContainer");
+    const alertMessage = document.getElementById("alertMessage");
+
+    alertContainer.classList.remove("d-none");
+    alertMessage.innerHTML = message;
 }
