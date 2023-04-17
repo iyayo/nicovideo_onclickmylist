@@ -27,6 +27,8 @@ chrome.runtime.onInstalled.addListener(() => {
         
         chrome.storage.local.set({"nvocm_clearNotificationsTime": isChecked}, () => clearNotificationsTime = isChecked)
     })
+
+    chrome.storage.local.remove(["nvocm_selectSize", "nvocm_autoClose", "nvocm_badgeMylistName"]);
 });
 
 chrome.runtime.onStartup.addListener(() => {
