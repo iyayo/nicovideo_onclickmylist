@@ -62,36 +62,41 @@
                                 <hr class="my-2">
                             </header>
 
-                            <div id="mylistObjectList">
-                                <div id="mylistObject-main" class="card border-0">
-                                    <div class="row g-0">
-                                        <div class="col-11">
-                                            <a id="mylistObject-url" href="#"
-                                                class="row text-decoration-none" target="_blank">
-                                                <div class="col position-relative" style="width: 144px;">
-                                                    <img id="mylistObject-thumbnail"
-                                                        src=""
-                                                        class="rounded img-fluid border"
-                                                        style="width: 144px;  height: 78px; object-fit: cover;">
-                                                    
-                                                    <small><div id="mylistObject-videoLength" class="position-absolute rounded text-white px-1"></div></small>
+                            <div id="mylistObjectList"></div>
+
+                            <div id="mylistObject-main" class="card border-0 d-none">
+                                <div class="row g-0">
+                                    <div class="col-11">
+                                        <a id="mylistObject-url" href="#"
+                                            class="row text-decoration-none" target="_blank">
+                                            <div class="col position-relative" style="width: 144px;">
+                                                <img id="mylistObject-thumbnail"
+                                                    src=""
+                                                    class="rounded img-fluid border"
+                                                    style="width: 144px;  height: 78px; object-fit: cover;">
+                                                
+                                                <small><div id="mylistObject-videoLength" class="position-absolute rounded text-white px-1"></div></small>
+                                            </div>
+                                            <div class="col-8 g-0">
+                                                <div class="card-body p-1">
+                                                    <h2 id="mylistObject-bodyTitle" class="card-title fs-6 lh-1 text-body align-baseline"></h2>
                                                 </div>
-                                                <div class="col-8 g-0">
-                                                    <div class="card-body p-1">
-                                                        <h2 id="mylistObject-bodyTitle" class="card-title fs-6 lh-1 text-body align-baseline"></h2>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </div>
-
-
-
-                                        <small><div id="mylistObject-memo" class="bg-light mt-2 p-2 d-none"></div></small>
+                                            </div>
+                                        </a>
                                     </div>
-                                    <hr class="my-2">
+
+
+
+                                    <small><div id="mylistObject-memo" class="bg-light mt-2 p-2 d-none"></div></small>
                                 </div>
+                                <hr class="my-2">
+                            </div>
+
+                            <div id="mylistObject-more" class="card border-0 d-none">
+                                <button id="mylistObject-more-button" class="btn btn-light" type="button">さらに読み込む…</button>
                             </div>
                         </div>
+                        
                     </div>
 
                     <div class="tab-pane fade" id="nav-memo" role="tabpanel" aria-labelledby="nav-memo-tab">

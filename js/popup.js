@@ -4,6 +4,8 @@ const memo = document.getElementById("memo");
 const memoClearButton = document.getElementById("memoClearButton");
 const options = document.forms["options"];
 const mylistObject_base = document.getElementById("mylistObject-main");
+const mylistObject_more = document.getElementById("mylistObject-more");
+let previewMylist;
 
 mylistSelect.addEventListener("click", e => {
     for (let i = 0; i < mylistSelect.children.length; i++) {
@@ -11,9 +13,15 @@ mylistSelect.addEventListener("click", e => {
     }
 
     e.target.classList.add("active");
-    previewMylistObject(e.target.dataset.name, e.target.dataset.id);
+
     Promise.resolve()
     .then(setStorage)
+    .then(() => previewMylistObject_firstPage(e.target.dataset.id, e.target.dataset.name))
+});
+
+mylistObject_more.addEventListener("click", () => {
+    previewMylist.page = ++previewMylist.page;
+    previewMylistObject_morePage();
 });
 
 memo.addEventListener("input", countMemoLength);
@@ -33,7 +41,8 @@ Promise.resolve()
     for (let i = 0; i < mylistSelect.children.length; i++) {
         if (mylistSelect.children[i].dataset.id === item.nvocm_id) {
             mylistSelect.children[i].classList.add("active");
-            previewMylistObject(mylistSelect.children[i].dataset.name, mylistSelect.children[i].dataset.id);
+            
+            previewMylistObject_firstPage(item.nvocm_id, item.nvocm_name);
         }
     }
 
@@ -119,80 +128,111 @@ function showAlert(message) {
     alertMessage.innerHTML = message;
 }
 
-function previewMylistObject(name, mylistId) {
-    const mylistObjectList = document.getElementById("mylistObjectList");
-    
-    const mylistName = document.getElementById("mylistName");
+async function previewMylistObject_firstPage(mylistId, name) {
+    previewMylist = new previewMylistObject(mylistId, name);
 
-    mylistName.innerText = name;
-    mylistObjectList.innerHTML = "";
+    previewMylist.reset();
+    previewMylist.changeMylistName();
+    let result = await previewMylist.getMylistObject();
+    previewMylist.appendMylistObject(result);
+}
 
-    if (mylistId == "watch-later") {
-        fetch(`https://nvapi.nicovideo.jp/v1/users/me/watch-later?sortKey=addedAt&sortOrder=desc&pageSize=100&page=1`, {
-            "headers": {
-                "x-frontend-id": "23",
-                "x-request-with": "N-garage"
-            },
-            "method": "GET",
-            "credentials": "include"
-            })
-            .then(response => response.json())
-            .then(obj => obj.data.watchLater)
-            .then(mylist => {
-                for (let i = 0; i < mylist.items.length; i++) {
-                    const object = mylist.items[i];
-                    const mylistObject_template = mylistObject_base.cloneNode(true);
+async function previewMylistObject_morePage() {
+    let result = await previewMylist.getMylistObject();
+    previewMylist.appendMylistObject(result);
+}
 
-                    mylistObject_template.querySelector("#mylistObject-url").href = "https://www.nicovideo.jp/watch/" + object.video.id;
-                    mylistObject_template.querySelector("#mylistObject-bodyTitle").innerText = object.video.title;
-                    mylistObject_template.querySelector("#mylistObject-thumbnail").src = object.video.thumbnail.url;
-                    mylistObject_template.querySelector("#mylistObject-videoLength").innerText = timeConvert(object.video.duration);
+class previewMylistObject {
+    static header = {
+        "headers": {
+            "x-frontend-id": "23",
+            "x-request-with": "N-garage"
+        },
+        "method": "GET",
+        "credentials": "include"
+    }
 
-                    if (object.description) {
+    static mylistObjectList = document.getElementById("mylistObjectList");
+
+    constructor (mylistId, name, type, page) {
+        this.mylistId = mylistId;
+        this.name = name;
+        this.type = type;
+        this.page = page;
+    }
+
+    reset () {
+        this.page = 1;
+        previewMylistObject.mylistObjectList.innerHTML = "";
+    }
+
+    changeMylistName () {
+        const mylistName = document.getElementById("mylistName");
+        mylistName.innerText = this.name;
+    }
+
+    async getMylistObject () {
+        if (!this.page) this.page = 1;
+
+        if (this.mylistId == "watch-later") {
+            this.type = "watch-later"
+            let response = await fetch(`https://nvapi.nicovideo.jp/v1/users/me/watch-later?sortKey=addedAt&sortOrder=desc&pageSize=100&page=${this.page}`, previewMylistObject.header);
+
+            response = await response.json();
+            return response;
+        } else {
+            this.type = "mylist";
+            let response = await fetch(`https://nvapi.nicovideo.jp/v1/users/me/mylists/${this.mylistId}?pageSize=100&page=${this.page}`, previewMylistObject.header);
+            
+            response = await response.json();
+            return response;
+        }
+    }
+
+    appendMylistObject (obj) {
+            let mylist;
+            if (this.type == "watch-later") mylist = obj.data.watchLater;
+            else mylist = obj.data.mylist;
+
+            for (let i = 0; i < mylist.items.length; i++) {
+                const object = mylist.items[i];
+                const mylistObject_template = mylistObject_base.cloneNode(true);
+                
+                mylistObject_template.classList.remove("d-none");
+                mylistObject_template.querySelector("#mylistObject-url").href = "https://www.nicovideo.jp/watch/" + object.video.id;
+                mylistObject_template.querySelector("#mylistObject-bodyTitle").innerText = object.video.title;
+                mylistObject_template.querySelector("#mylistObject-thumbnail").src = object.video.thumbnail.url;
+                mylistObject_template.querySelector("#mylistObject-videoLength").innerText = this.timeConvert(object.video.duration);
+
+                if (this.type == "watch-later") {
+                    if (object.memo) {
                         mylistObject_template.querySelector("#mylistObject-memo").innerText = object.memo;
                         mylistObject_template.querySelector("#mylistObject-memo").classList.remove("d-none");
                     }
-                    
-                    mylistObjectList.append(mylistObject_template);
-                }
-            })
-    } else {
-        fetch(`https://nvapi.nicovideo.jp/v1/users/me/mylists/${mylistId}?pageSize=100&page=1`, {
-            "headers": {
-                "x-frontend-id": "23",
-                "x-request-with": "N-garage"
-            },
-            "method": "GET",
-            "credentials": "include"
-            })
-            .then(response => response.json())
-            .then(obj => obj.data.mylist)
-            .then(mylist => {
-                for (let i = 0; i < mylist.items.length; i++) {
-                    const object = mylist.items[i];
-                    const mylistObject_template = mylistObject_base.cloneNode(true);
-
-                    mylistObject_template.querySelector("#mylistObject-url").href = "https://www.nicovideo.jp/watch/" + object.video.id;
-                    mylistObject_template.querySelector("#mylistObject-bodyTitle").innerText = object.video.title;
-                    mylistObject_template.querySelector("#mylistObject-thumbnail").src = object.video.thumbnail.url;
-                    mylistObject_template.querySelector("#mylistObject-videoLength").innerText = timeConvert(object.video.duration);
-
+                } else {
                     if (object.description) {
                         mylistObject_template.querySelector("#mylistObject-memo").innerText = object.description;
                         mylistObject_template.querySelector("#mylistObject-memo").classList.remove("d-none");
                     }
-                    
-                    mylistObjectList.append(mylistObject_template);
                 }
-            })
+
+                previewMylistObject.mylistObjectList.append(mylistObject_template);
+            }
+
+            if (mylist.hasNext) {
+                mylistObject_more.classList.remove("d-none");
+            } else {
+                mylistObject_more.classList.add("d-none");
+            }
+            
     }
 
-        function timeConvert(time) {
-            var min = Math.floor(time / 60);
-            var sec = time % 60;
-
-            if (sec < 10) sec = "0" + sec;
-
-            return min + ":" + sec;
-        }
+    timeConvert (time) {
+        let min = Math.floor(time / 60);
+        let sec = time % 60;
+    
+        if (sec < 10) sec = "0" + sec;
+    
+        return min + ":" + sec;
+    }
 }
