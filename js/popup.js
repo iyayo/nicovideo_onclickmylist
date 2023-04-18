@@ -1,5 +1,4 @@
 const mylistSelect = document.getElementById("mylistSelect");
-const watchlaterItemsCount = document.getElementById("watchlaterItemsCount");
 const selected = mylistSelect.getElementsByClassName("active");
 const memo = document.getElementById("memo");
 const memoClearButton = document.getElementById("memoClearButton");
@@ -56,29 +55,17 @@ function checkUserSession(){
 
 function getMylist() {
     return new Promise((resolve, reject) => {
-        fetch("https://nvapi.nicovideo.jp/v1/users/me/watch-later", { "headers": { "x-frontend-id": "6" }, "method": "GET" })
-        .then(response => response.json())
-        .then(obj => obj.data.watchLater.totalCount)
-        .then(count => watchlaterItemsCount.innerText = count)
-
         fetch("https://nvapi.nicovideo.jp/v1/users/me/mylists", { "headers": { "x-frontend-id": "6" }, "method": "GET" })
         .then(response => response.json())
         .then(obj => obj.data.mylists)
         .then(arr => {
             for (let i = 0; i < arr.length; i++) {
                 const mylistOption = document.createElement("li");
-                const mylistItemsCount = document.createElement("span");
                 mylistOption.innerText = arr[i].name;
-                mylistItemsCount.className = "mylistItemsCount badge bg-primary rounded-pill";
-                mylistItemsCount.innerText = arr[i].itemsCount;
-                mylistOption.className = "list-group-item d-flex justify-content-between align-items-center";
+                mylistOption.className = "list-group-item";
                 mylistOption.dataset.id = arr[i].id;
-                mylistOption.dataset.num = i + 2;
                 mylistOption.dataset.name = arr[i].name;
-                mylistOption.dataset.description = arr[i].description;
-                mylistOption.dataset.url = "https://www.nicovideo.jp/my/mylist/" + arr[i].id;
                 mylistSelect.appendChild(mylistOption);
-                mylistOption.appendChild(mylistItemsCount);
             }
             resolve();
         })
