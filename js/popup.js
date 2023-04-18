@@ -140,7 +140,37 @@ function previewMylistObject(name, mylistId) {
     mylistName.innerText = name;
     mylistObjectList.innerHTML = "";
 
-    fetch(`https://nvapi.nicovideo.jp/v1/users/me/mylists/${mylistId}?pageSize=100&page=1`, {
+    if (mylistId == "watch-later") {
+        fetch(`https://nvapi.nicovideo.jp/v1/users/me/watch-later?sortKey=addedAt&sortOrder=desc&pageSize=100&page=1`, {
+            "headers": {
+                "x-frontend-id": "23",
+                "x-request-with": "N-garage"
+            },
+            "method": "GET",
+            "credentials": "include"
+            })
+            .then(response => response.json())
+            .then(obj => obj.data.watchLater)
+            .then(mylist => {
+                for (let i = 0; i < mylist.items.length; i++) {
+                    const object = mylist.items[i];
+                    const mylistObject_template = mylistObject_base.cloneNode(true);
+
+                    mylistObject_template.querySelector("#mylistObject-url").href = "https://www.nicovideo.jp/watch/" + object.video.id;
+                    mylistObject_template.querySelector("#mylistObject-bodyTitle").innerText = object.video.title;
+                    mylistObject_template.querySelector("#mylistObject-thumbnail").src = object.video.thumbnail.url;
+                    mylistObject_template.querySelector("#mylistObject-videoLength").innerText = timeConvert(object.video.duration);
+
+                    if (object.description) {
+                        mylistObject_template.querySelector("#mylistObject-memo").innerText = object.memo;
+                        mylistObject_template.querySelector("#mylistObject-memo").classList.remove("d-none");
+                    }
+                    
+                    mylistObjectList.append(mylistObject_template);
+                }
+            })
+    } else {
+        fetch(`https://nvapi.nicovideo.jp/v1/users/me/mylists/${mylistId}?pageSize=100&page=1`, {
             "headers": {
                 "x-frontend-id": "23",
                 "x-request-with": "N-garage"
@@ -168,6 +198,7 @@ function previewMylistObject(name, mylistId) {
                     mylistObjectList.append(mylistObject_template);
                 }
             })
+    }
 
         function timeConvert(time) {
             var min = Math.floor(time / 60);
