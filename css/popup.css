@@ -8,8 +8,8 @@ body {
     max-height: 530px;
 }
 
-#mylistObjectList {
-    height: 480px;
+#mylistContainer {
+    height: 530px;
     overflow-y: auto;
 }
 
