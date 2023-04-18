@@ -51,13 +51,15 @@ Promise.resolve()
     if (item.nvocm_clearNotificationsTime !== undefined) options.clearNotificationsTime.checked = item.nvocm_clearNotificationsTime;
 })
 .then(countMemoLength)
-.catch(showAlert)
 
 function checkUserSession(){
     return new Promise((resolve,reject) => {
         chrome.cookies.get({url:'https://www.nicovideo.jp/',name:'user_session'}, (value) => {
             if (value != null) resolve();
-            else reject("マイリストの取得に失敗しました。<a href='https://account.nicovideo.jp/login' target='_blank'>ログイン</a>してから再度開いてください。");
+            else {
+                showToast("マイリストの取得に失敗しました。ログインしてから再度開いてください");
+                reject();
+            }
         });
     })
 }
@@ -65,6 +67,10 @@ function checkUserSession(){
 function getMylist() {
     return new Promise((resolve, reject) => {
         fetch("https://nvapi.nicovideo.jp/v1/users/me/mylists", { "headers": { "x-frontend-id": "6" }, "method": "GET" })
+        .then(response => {
+            if (response.status === 200) return response;
+            else reject();
+        })
         .then(response => response.json())
         .then(obj => obj.data.mylists)
         .then(arr => {
@@ -78,6 +84,7 @@ function getMylist() {
             }
             resolve();
         })
+        .catch(() => showToast("マイリストの取得に失敗しました", false))
     })
 }
 
@@ -120,12 +127,16 @@ function getStorage() {
     })
 }
 
-function showAlert(message) {
-    const alertContainer = document.getElementById("alertContainer");
-    const alertMessage = document.getElementById("alertMessage");
+function showToast(message, autohide) {
+    const toastContainer = document.getElementsByClassName("toast-container")[0];
+    const toast_base = document.getElementsByClassName("toast")[0];
+    const toast_template = toast_base.cloneNode(true);
 
-    alertContainer.classList.remove("d-none");
-    alertMessage.innerHTML = message;
+    toast_template.getElementsByClassName("toast-body")[0].innerText = message;
+    const toast = new bootstrap.Toast(toast_template, {"autohide": autohide, "delay": 3000});
+
+    toastContainer.append(toast_template);
+    toast.show();
 }
 
 async function previewMylistObject_firstPage(mylistId, name) {
@@ -251,7 +262,9 @@ class previewMylistObject {
         .then(response => {
             if (response.status === 200) {
                 previewMylistObject.mylistObjectList.querySelector(`div[data-itemid="${itemId}"]`).remove();
+                showToast("マイリストから削除しました", true);
             }
         })
+        .catch(() => showToast("削除に失敗しました", false))
     }
 }
