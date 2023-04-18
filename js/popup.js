@@ -198,11 +198,14 @@ class previewMylistObject {
                 const object = mylist.items[i];
                 const mylistObject_template = mylistObject_base.cloneNode(true);
                 
+                mylistObject_template.dataset.itemid = object.itemId;
                 mylistObject_template.classList.remove("d-none");
                 mylistObject_template.querySelector("#mylistObject-url").href = "https://www.nicovideo.jp/watch/" + object.video.id;
                 mylistObject_template.querySelector("#mylistObject-bodyTitle").innerText = object.video.title;
                 mylistObject_template.querySelector("#mylistObject-thumbnail").src = object.video.thumbnail.url;
                 mylistObject_template.querySelector("#mylistObject-videoLength").innerText = this.timeConvert(object.video.duration);
+                mylistObject_template.querySelector("#mylistObject-action-delete").dataset.itemid = object.itemId;
+                mylistObject_template.querySelector("#mylistObject-action-delete").addEventListener("click", element => { this.deleteMylistObject(element.target.dataset.itemid)});
 
                 if (this.type == "watch-later") {
                     if (object.memo) {
@@ -234,5 +237,21 @@ class previewMylistObject {
         if (sec < 10) sec = "0" + sec;
     
         return min + ":" + sec;
+    }
+
+    deleteMylistObject(itemId) {
+        fetch(`https://nvapi.nicovideo.jp/v1/users/me/mylists/${this.mylistId}/items?itemIds=${itemId}`, {
+            "headers": {
+                "x-frontend-id": "6",
+                "x-request-with": "https://www.nicovideo.jp"
+            },
+            "method": "DELETE",
+            "credentials": "include"
+        })
+        .then(response => {
+            if (response.status === 200) {
+                previewMylistObject.mylistObjectList.querySelector(`div[data-itemid="${itemId}"]`).remove();
+            }
+        })
     }
 }
