@@ -178,6 +178,10 @@ class previewMylistObject {
     }
 
     changeMylistName () {
+        const myllistName_url = document.getElementById("myllistName-url");
+        if (this.mylistId == "watch-later") myllistName_url.href = "https://www.nicovideo.jp/my/watchlater";
+        else myllistName_url.href = `https://www.nicovideo.jp/my/mylist/${this.mylistId}`;
+        
         const mylistName = document.getElementById("mylistName");
         mylistName.innerText = this.name;
     }
