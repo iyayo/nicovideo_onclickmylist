@@ -187,19 +187,16 @@ class previewMylistObject {
 
     async getMylistObject () {
         if (!this.page) this.page = 1;
+        let getMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/mylists/${this.mylistId}?pageSize=100&page=${this.page}`;
+        if (this.mylistId == "watchlater") getMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/watch-later?sortKey=addedAt&sortOrder=desc&pageSize=100&page=${this.page}`;
 
-        if (this.mylistId == "watchlater") {
-            this.type = "watchlater"
-            let response = await fetch(`https://nvapi.nicovideo.jp/v1/users/me/watch-later?sortKey=addedAt&sortOrder=desc&pageSize=100&page=${this.page}`, previewMylistObject.header);
-
+        try {
+            let response = await fetch(getMylistObject_url, previewMylistObject.header);
             response = await response.json();
-            return response;
-        } else {
-            this.type = "mylist";
-            let response = await fetch(`https://nvapi.nicovideo.jp/v1/users/me/mylists/${this.mylistId}?pageSize=100&page=${this.page}`, previewMylistObject.header);
             
-            response = await response.json();
             return response;
+        } catch (error) {
+            showToast("マイリストの読み込みに失敗しました", false);
         }
     }
 
