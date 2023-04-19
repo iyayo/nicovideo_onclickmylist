@@ -274,6 +274,7 @@ class previewMylistObject {
         .then(response => {
             if (response.status === 200) {
                 previewMylistObject.mylistObjectList.querySelector(`div[data-itemid="${itemId}"]`).remove();
+                document.getElementById("mylistObject-itemscount").innerText = String(document.getElementById("mylistObject-itemscount").innerText) - 1;
                 showToast("マイリストから削除しました", true);
             }
         })
