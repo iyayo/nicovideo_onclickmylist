@@ -181,7 +181,7 @@ class previewMylistObject {
         const myllistName_url = document.getElementById("myllistName-url");
         if (this.mylistId == "watch-later") myllistName_url.href = "https://www.nicovideo.jp/my/watchlater";
         else myllistName_url.href = `https://www.nicovideo.jp/my/mylist/${this.mylistId}`;
-        
+
         const mylistName = document.getElementById("mylistName");
         mylistName.innerText = this.name;
     }
@@ -260,7 +260,10 @@ class previewMylistObject {
     }
 
     deleteMylistObject(itemId) {
-        fetch(`https://nvapi.nicovideo.jp/v1/users/me/mylists/${this.mylistId}/items?itemIds=${itemId}`, {
+        let deleteMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/mylists/${this.mylistId}/items?itemIds=${itemId}`;
+        if (this.mylistId == "watch-later") deleteMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/watch-later?itemIds=${itemId}`;
+
+        fetch(deleteMylistObject_url, {
             "headers": {
                 "x-frontend-id": "6",
                 "x-request-with": "https://www.nicovideo.jp"
