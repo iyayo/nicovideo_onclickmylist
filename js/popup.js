@@ -57,7 +57,7 @@ function checkUserSession(){
         chrome.cookies.get({url:'https://www.nicovideo.jp/',name:'user_session'}, (value) => {
             if (value != null) resolve();
             else {
-                showToast("マイリストの取得に失敗しました。ログインしてから再度開いてください");
+                showToast("マイリストの取得に失敗しました。ログインしてから再度開いてください", false);
                 reject();
             }
         });
