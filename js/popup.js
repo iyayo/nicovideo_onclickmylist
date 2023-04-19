@@ -162,13 +162,23 @@ async function previewMylistObject_morePage() {
 }
 
 class previewMylistObject {
-    static header = {
+    header = {
+        "get": {
             "headers": {
                 "x-frontend-id": "23",
                 "x-request-with": "N-garage"
             },
             "method": "GET",
             "credentials": "include"
+        },
+        "delete": {
+            "headers": {
+                "x-frontend-id": "6",
+                "x-request-with": "https://www.nicovideo.jp"
+            },
+            "method": "DELETE",
+            "credentials": "include"
+        }
     }
 
     static mylistObjectList = document.getElementById("mylistObjectList");
@@ -199,7 +209,7 @@ class previewMylistObject {
         if (this.mylistId == "watchlater") getMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/watch-later?sortKey=addedAt&sortOrder=desc&pageSize=100&page=${this.page}`;
 
         try {
-            let response = await fetch(getMylistObject_url, previewMylistObject.header);
+            let response = await fetch(getMylistObject_url, this.header.get);
             response = await response.json();
             
             return response;
@@ -263,25 +273,19 @@ class previewMylistObject {
         return min + ":" + sec;
     }
 
-    deleteMylistObject(itemId) {
+    async deleteMylistObject(itemId) {
         let deleteMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/mylists/${this.mylistId}/items?itemIds=${itemId}`;
         if (this.mylistId == "watchlater") deleteMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/watch-later?itemIds=${itemId}`;
         
-        fetch(deleteMylistObject_url, {
-            "headers": {
-                "x-frontend-id": "6",
-                "x-request-with": "https://www.nicovideo.jp"
-            },
-            "method": "DELETE",
-            "credentials": "include"
-        })
-        .then(response => {
+        try {
+            const response = await fetch(deleteMylistObject_url, this.header.delete);
             if (response.status === 200) {
                 previewMylistObject.mylistObjectList.querySelector(`div[data-itemid="${itemId}"]`).remove();
                 document.getElementById("mylistObject-itemscount").innerText = String(document.getElementById("mylistObject-itemscount").innerText) - 1;
                 showToast("マイリストから削除しました", true);
             }
-        })
-        .catch(() => showToast("削除に失敗しました", false))
+        } catch (error) {
+            showToast("削除に失敗しました", false);
+        }
     }
 }
