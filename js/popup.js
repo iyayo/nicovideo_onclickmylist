@@ -15,16 +15,16 @@ class localStorage {
                 nvocm_notificationSound: options.notificationSound.checked,
                 nvocm_clearNotificationsTime: options.clearNotificationsTime.checked
             }
-    
+
             if (selected.length !== 0) {
-                chrome.action.setBadgeBackgroundColor({color: "#0080ff"});
-                chrome.action.setBadgeTextColor({color: "#fff"});
-                chrome.action.setBadgeText({"text": String(selected[0].dataset.name)});
-    
+                chrome.action.setBadgeBackgroundColor({ color: "#0080ff" });
+                chrome.action.setBadgeTextColor({ color: "#fff" });
+                chrome.action.setBadgeText({ "text": String(selected[0].dataset.name) });
+
                 data.nvocm_id = selected[0].dataset.id;
                 data.nvocm_name = selected[0].dataset.name;
             }
-            
+
             chrome.storage.local.set(data, () => resolve());
         })
     }
@@ -39,11 +39,11 @@ class localStorage {
         for (let i = 0; i < mylistSelect.children.length; i++) {
             if (mylistSelect.children[i].dataset.id === item.nvocm_id) {
                 mylistSelect.children[i].classList.add("active");
-                
+
                 previewMylistObject_firstPage(item.nvocm_id, item.nvocm_name);
             }
         }
-    
+
         if (item.nvocm_desc !== undefined) memo.value = item.nvocm_desc;
         if (item.nvocm_notificationSound !== undefined) options.notificationSound.checked = item.nvocm_notificationSound;
         if (item.nvocm_clearNotificationsTime !== undefined) options.clearNotificationsTime.checked = item.nvocm_clearNotificationsTime;
@@ -78,7 +78,7 @@ memoClearButton.addEventListener("click", () => {
 
 options.addEventListener("change", storage.set);
 
-(async() => {
+(async () => {
     await checkUserSession();
     await getMylist();
 
@@ -88,9 +88,9 @@ options.addEventListener("change", storage.set);
     countMemoLength();
 })();
 
-function checkUserSession(){
-    return new Promise((resolve,reject) => {
-        chrome.cookies.get({url:'https://www.nicovideo.jp/',name:'user_session'}, (value) => {
+function checkUserSession() {
+    return new Promise((resolve, reject) => {
+        chrome.cookies.get({ url: 'https://www.nicovideo.jp/', name: 'user_session' }, (value) => {
             if (value != null) resolve();
             else {
                 showToast("マイリストの取得に失敗しました。ログインしてから再度開いてください", false);
@@ -103,24 +103,24 @@ function checkUserSession(){
 function getMylist() {
     return new Promise((resolve, reject) => {
         fetch("https://nvapi.nicovideo.jp/v1/users/me/mylists", { "headers": { "x-frontend-id": "6" }, "method": "GET" })
-        .then(response => {
-            if (response.status === 200) return response;
-            else reject();
-        })
-        .then(response => response.json())
-        .then(obj => obj.data.mylists)
-        .then(arr => {
-            for (let i = 0; i < arr.length; i++) {
-                const mylistOption = document.createElement("li");
-                mylistOption.innerText = arr[i].name;
-                mylistOption.className = "list-group-item";
-                mylistOption.dataset.id = arr[i].id;
-                mylistOption.dataset.name = arr[i].name;
-                mylistSelect.appendChild(mylistOption);
-            }
-            resolve();
-        })
-        .catch(() => showToast("マイリストの取得に失敗しました", false))
+            .then(response => {
+                if (response.status === 200) return response;
+                else reject();
+            })
+            .then(response => response.json())
+            .then(obj => obj.data.mylists)
+            .then(arr => {
+                for (let i = 0; i < arr.length; i++) {
+                    const mylistOption = document.createElement("li");
+                    mylistOption.innerText = arr[i].name;
+                    mylistOption.className = "list-group-item";
+                    mylistOption.dataset.id = arr[i].id;
+                    mylistOption.dataset.name = arr[i].name;
+                    mylistSelect.appendChild(mylistOption);
+                }
+                resolve();
+            })
+            .catch(() => showToast("マイリストの取得に失敗しました", false))
     })
 }
 
@@ -141,7 +141,7 @@ function showToast(message, autohide) {
     const toast_template = toast_base.cloneNode(true);
 
     toast_template.getElementsByClassName("toast-body")[0].innerText = message;
-    const toast = new bootstrap.Toast(toast_template, {"autohide": autohide, "delay": 3000});
+    const toast = new bootstrap.Toast(toast_template, { "autohide": autohide, "delay": 3000 });
 
     toastContainer.append(toast_template);
     toast.show();
@@ -183,18 +183,18 @@ class previewMylistObject {
 
     static mylistObjectList = document.getElementById("mylistObjectList");
 
-    constructor (mylistId, name, page) {
+    constructor(mylistId, name, page) {
         this.mylistId = mylistId;
         this.name = name;
         this.page = page;
     }
 
-    reset () {
+    reset() {
         this.page = 1;
         previewMylistObject.mylistObjectList.innerHTML = "";
     }
 
-    changeMylistName () {
+    changeMylistName() {
         const myllistName_url = document.getElementById("myllistName-url");
         if (this.mylistId == "watchlater") myllistName_url.href = "https://www.nicovideo.jp/my/watchlater";
         else myllistName_url.href = `https://www.nicovideo.jp/my/mylist/${this.mylistId}`;
@@ -203,7 +203,7 @@ class previewMylistObject {
         mylistName.innerText = this.name;
     }
 
-    async getMylistObject () {
+    async getMylistObject() {
         if (!this.page) this.page = 1;
         let getMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/mylists/${this.mylistId}?pageSize=100&page=${this.page}`;
         if (this.mylistId == "watchlater") getMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/watch-later?sortKey=addedAt&sortOrder=desc&pageSize=100&page=${this.page}`;
@@ -211,79 +211,80 @@ class previewMylistObject {
         try {
             let response = await fetch(getMylistObject_url, this.header.get);
             response = await response.json();
-            
+
             return response;
         } catch (error) {
             showToast("マイリストの読み込みに失敗しました", false);
         }
     }
 
-    appendMylistObject (obj) {
-            let mylist;
+    appendMylistObject(obj) {
+        let mylist;
+        if (this.mylistId == "watchlater") {
+            mylist = obj.data.watchLater;
+            document.getElementById("mylistObject-itemscount").innerText = mylist.totalCount;
+        } else {
+            mylist = obj.data.mylist;
+            document.getElementById("mylistObject-itemscount").innerText = mylist.totalItemCount;
+        }
+
+        for (let i = 0; i < mylist.items.length; i++) {
+            const object = mylist.items[i];
+            const mylistObject_template = mylistObject_base.cloneNode(true);
+
+            mylistObject_template.dataset.itemid = object.itemId;
+            mylistObject_template.classList.remove("d-none");
+            mylistObject_template.querySelector("#mylistObject-url").href = "https://www.nicovideo.jp/watch/" + object.video.id;
+            mylistObject_template.querySelector("#mylistObject-bodyTitle").innerText = object.video.title;
+            mylistObject_template.querySelector("#mylistObject-thumbnail").src = object.video.thumbnail.url;
+            mylistObject_template.querySelector("#mylistObject-videoLength").innerText = this.timeConvert(object.video.duration);
+            mylistObject_template.querySelector("#mylistObject-action-delete").dataset.itemid = object.itemId;
+            mylistObject_template.querySelector("#mylistObject-action-delete").addEventListener("click", element => { this.deleteMylistObject(element.target.dataset.itemid) });
+
             if (this.mylistId == "watchlater") {
-                mylist = obj.data.watchLater;
-                document.getElementById("mylistObject-itemscount").innerText = mylist.totalCount;
-            } else {
-                mylist = obj.data.mylist;
-                document.getElementById("mylistObject-itemscount").innerText = mylist.totalItemCount;
-            }
-
-            for (let i = 0; i < mylist.items.length; i++) {
-                const object = mylist.items[i];
-                const mylistObject_template = mylistObject_base.cloneNode(true);
-                
-                mylistObject_template.dataset.itemid = object.itemId;
-                mylistObject_template.classList.remove("d-none");
-                mylistObject_template.querySelector("#mylistObject-url").href = "https://www.nicovideo.jp/watch/" + object.video.id;
-                mylistObject_template.querySelector("#mylistObject-bodyTitle").innerText = object.video.title;
-                mylistObject_template.querySelector("#mylistObject-thumbnail").src = object.video.thumbnail.url;
-                mylistObject_template.querySelector("#mylistObject-videoLength").innerText = this.timeConvert(object.video.duration);
-                mylistObject_template.querySelector("#mylistObject-action-delete").dataset.itemid = object.itemId;
-                mylistObject_template.querySelector("#mylistObject-action-delete").addEventListener("click", element => { this.deleteMylistObject(element.target.dataset.itemid)});
-
-                if (this.mylistId == "watchlater") {
-                    if (object.memo) {
-                        mylistObject_template.querySelector("#mylistObject-memo").innerText = object.memo;
-                        mylistObject_template.querySelector("#mylistObject-memo").classList.remove("d-none");
-                    }
-                } else {
-                    if (object.description) {
-                        mylistObject_template.querySelector("#mylistObject-memo").innerText = object.description;
-                        mylistObject_template.querySelector("#mylistObject-memo").classList.remove("d-none");
-                    }
+                if (object.memo) {
+                    mylistObject_template.querySelector("#mylistObject-memo").innerText = object.memo;
+                    mylistObject_template.querySelector("#mylistObject-memo").classList.remove("d-none");
                 }
-
-                previewMylistObject.mylistObjectList.append(mylistObject_template);
-            }
-
-            if (mylist.hasNext) {
-                mylistObject_more.classList.remove("d-none");
             } else {
-                mylistObject_more.classList.add("d-none");
+                if (object.description) {
+                    mylistObject_template.querySelector("#mylistObject-memo").innerText = object.description;
+                    mylistObject_template.querySelector("#mylistObject-memo").classList.remove("d-none");
+                }
             }
-            
+
+            previewMylistObject.mylistObjectList.append(mylistObject_template);
+        }
+
+        if (mylist.hasNext) {
+            mylistObject_more.classList.remove("d-none");
+        } else {
+            mylistObject_more.classList.add("d-none");
+        }
+
     }
 
-    timeConvert (time) {
+    timeConvert(time) {
         let min = Math.floor(time / 60);
         let sec = time % 60;
-    
+
         if (sec < 10) sec = "0" + sec;
-    
+
         return min + ":" + sec;
     }
 
     async deleteMylistObject(itemId) {
         let deleteMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/mylists/${this.mylistId}/items?itemIds=${itemId}`;
         if (this.mylistId == "watchlater") deleteMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/watch-later?itemIds=${itemId}`;
-        
+
         try {
             const response = await fetch(deleteMylistObject_url, this.header.delete);
-            if (response.status === 200) {
-                previewMylistObject.mylistObjectList.querySelector(`div[data-itemid="${itemId}"]`).remove();
-                document.getElementById("mylistObject-itemscount").innerText = String(document.getElementById("mylistObject-itemscount").innerText) - 1;
-                showToast("マイリストから削除しました", true);
-            }
+
+            if (response.status !== 200) return;
+
+            previewMylistObject.mylistObjectList.querySelector(`div[data-itemid="${itemId}"]`).remove();
+            document.getElementById("mylistObject-itemscount").innerText = String(document.getElementById("mylistObject-itemscount").innerText) - 1;
+            showToast("マイリストから削除しました", true);
         } catch (error) {
             showToast("削除に失敗しました", false);
         }
