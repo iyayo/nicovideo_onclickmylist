@@ -202,8 +202,13 @@ class previewMylistObject {
 
     appendMylistObject (obj) {
             let mylist;
-            if (this.type == "watch-later") mylist = obj.data.watchLater;
-            else mylist = obj.data.mylist;
+            if (this.type == "watch-later") {
+                mylist = obj.data.watchLater;
+                document.getElementById("mylistObject-itemscount").innerText = mylist.totalCount;
+            } else {
+                mylist = obj.data.mylist;
+                document.getElementById("mylistObject-itemscount").innerText = mylist.totalItemCount;
+            }
 
             for (let i = 0; i < mylist.items.length; i++) {
                 const object = mylist.items[i];
