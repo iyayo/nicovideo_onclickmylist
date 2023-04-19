@@ -165,10 +165,9 @@ class previewMylistObject {
 
     static mylistObjectList = document.getElementById("mylistObjectList");
 
-    constructor (mylistId, name, type, page) {
+    constructor (mylistId, name, page) {
         this.mylistId = mylistId;
         this.name = name;
-        this.type = type;
         this.page = page;
     }
 
@@ -206,7 +205,7 @@ class previewMylistObject {
 
     appendMylistObject (obj) {
             let mylist;
-            if (this.type == "watchlater") {
+            if (this.mylistId == "watchlater") {
                 mylist = obj.data.watchLater;
                 document.getElementById("mylistObject-itemscount").innerText = mylist.totalCount;
             } else {
@@ -227,7 +226,7 @@ class previewMylistObject {
                 mylistObject_template.querySelector("#mylistObject-action-delete").dataset.itemid = object.itemId;
                 mylistObject_template.querySelector("#mylistObject-action-delete").addEventListener("click", element => { this.deleteMylistObject(element.target.dataset.itemid)});
 
-                if (this.type == "watchlater") {
+                if (this.mylistId == "watchlater") {
                     if (object.memo) {
                         mylistObject_template.querySelector("#mylistObject-memo").innerText = object.memo;
                         mylistObject_template.querySelector("#mylistObject-memo").classList.remove("d-none");
