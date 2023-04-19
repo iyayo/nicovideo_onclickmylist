@@ -179,7 +179,7 @@ class previewMylistObject {
 
     changeMylistName () {
         const myllistName_url = document.getElementById("myllistName-url");
-        if (this.mylistId == "watch-later") myllistName_url.href = "https://www.nicovideo.jp/my/watchlater";
+        if (this.mylistId == "watchlater") myllistName_url.href = "https://www.nicovideo.jp/my/watchlater";
         else myllistName_url.href = `https://www.nicovideo.jp/my/mylist/${this.mylistId}`;
 
         const mylistName = document.getElementById("mylistName");
@@ -189,8 +189,8 @@ class previewMylistObject {
     async getMylistObject () {
         if (!this.page) this.page = 1;
 
-        if (this.mylistId == "watch-later") {
-            this.type = "watch-later"
+        if (this.mylistId == "watchlater") {
+            this.type = "watchlater"
             let response = await fetch(`https://nvapi.nicovideo.jp/v1/users/me/watch-later?sortKey=addedAt&sortOrder=desc&pageSize=100&page=${this.page}`, previewMylistObject.header);
 
             response = await response.json();
@@ -206,7 +206,7 @@ class previewMylistObject {
 
     appendMylistObject (obj) {
             let mylist;
-            if (this.type == "watch-later") {
+            if (this.type == "watchlater") {
                 mylist = obj.data.watchLater;
                 document.getElementById("mylistObject-itemscount").innerText = mylist.totalCount;
             } else {
@@ -227,7 +227,7 @@ class previewMylistObject {
                 mylistObject_template.querySelector("#mylistObject-action-delete").dataset.itemid = object.itemId;
                 mylistObject_template.querySelector("#mylistObject-action-delete").addEventListener("click", element => { this.deleteMylistObject(element.target.dataset.itemid)});
 
-                if (this.type == "watch-later") {
+                if (this.type == "watchlater") {
                     if (object.memo) {
                         mylistObject_template.querySelector("#mylistObject-memo").innerText = object.memo;
                         mylistObject_template.querySelector("#mylistObject-memo").classList.remove("d-none");
@@ -261,7 +261,7 @@ class previewMylistObject {
 
     deleteMylistObject(itemId) {
         let deleteMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/mylists/${this.mylistId}/items?itemIds=${itemId}`;
-        if (this.mylistId == "watch-later") deleteMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/watch-later?itemIds=${itemId}`;
+        if (this.mylistId == "watchlater") deleteMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/watch-later?itemIds=${itemId}`;
 
         fetch(deleteMylistObject_url, {
             "headers": {
