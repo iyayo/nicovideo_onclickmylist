@@ -7,16 +7,61 @@ const mylistObject_base = document.getElementById("mylistObject-main");
 const mylistObject_more = document.getElementById("mylistObject-more");
 let previewMylist;
 
-mylistSelect.addEventListener("click", e => {
+class localStorage {
+    set() {
+        return new Promise((resolve, reject) => {
+            const data = {
+                nvocm_desc: memo.value,
+                nvocm_notificationSound: options.notificationSound.checked,
+                nvocm_clearNotificationsTime: options.clearNotificationsTime.checked
+            }
+    
+            if (selected.length !== 0) {
+                chrome.action.setBadgeBackgroundColor({color: "#0080ff"});
+                chrome.action.setBadgeTextColor({color: "#fff"});
+                chrome.action.setBadgeText({"text": String(selected[0].dataset.name)});
+    
+                data.nvocm_id = selected[0].dataset.id;
+                data.nvocm_name = selected[0].dataset.name;
+            }
+            
+            chrome.storage.local.set(data, () => resolve());
+        })
+    }
+
+    get() {
+        return new Promise((resolve, reject) => {
+            chrome.storage.local.get(null, item => resolve(item));
+        })
+    }
+
+    restore(item) {
+        for (let i = 0; i < mylistSelect.children.length; i++) {
+            if (mylistSelect.children[i].dataset.id === item.nvocm_id) {
+                mylistSelect.children[i].classList.add("active");
+                
+                previewMylistObject_firstPage(item.nvocm_id, item.nvocm_name);
+            }
+        }
+    
+        if (item.nvocm_desc !== undefined) memo.value = item.nvocm_desc;
+        if (item.nvocm_notificationSound !== undefined) options.notificationSound.checked = item.nvocm_notificationSound;
+        if (item.nvocm_clearNotificationsTime !== undefined) options.clearNotificationsTime.checked = item.nvocm_clearNotificationsTime;
+    }
+}
+
+const storage = new localStorage();
+
+mylistSelect.addEventListener("click", async e => {
     for (let i = 0; i < mylistSelect.children.length; i++) {
         mylistSelect.children[i].classList.remove("active");
     }
 
     e.target.classList.add("active");
 
-    Promise.resolve()
-    .then(setStorage)
-    .then(() => previewMylistObject_firstPage(e.target.dataset.id, e.target.dataset.name))
+    await storage.set();
+
+    previewMylistObject_firstPage(e.target.dataset.id, e.target.dataset.name);
 });
 
 mylistObject_more.addEventListener("click", () => {
@@ -31,26 +76,17 @@ memoClearButton.addEventListener("click", () => {
     countMemoLength();
 });
 
-options.addEventListener("change", setStorage);
+options.addEventListener("change", storage.set);
 
-Promise.resolve()
-.then(checkUserSession)
-.then(getMylist)
-.then(getStorage)
-.then(item => {
-    for (let i = 0; i < mylistSelect.children.length; i++) {
-        if (mylistSelect.children[i].dataset.id === item.nvocm_id) {
-            mylistSelect.children[i].classList.add("active");
-            
-            previewMylistObject_firstPage(item.nvocm_id, item.nvocm_name);
-        }
-    }
+(async() => {
+    await checkUserSession();
+    await getMylist();
 
-    if (item.nvocm_desc !== undefined) memo.value = item.nvocm_desc;
-    if (item.nvocm_notificationSound !== undefined) options.notificationSound.checked = item.nvocm_notificationSound;
-    if (item.nvocm_clearNotificationsTime !== undefined) options.clearNotificationsTime.checked = item.nvocm_clearNotificationsTime;
-})
-.then(countMemoLength)
+    const item = await storage.get();
+    storage.restore(item);
+
+    countMemoLength();
+})();
 
 function checkUserSession(){
     return new Promise((resolve,reject) => {
@@ -93,38 +129,10 @@ function countMemoLength() {
     const count = memo.value.length;
     memoLength.innerText = count;
 
-    Promise.resolve()
-    .then(setStorage)
+    storage.set();
 
     if (count === 256) memoLength.style.color = "red";
     else memoLength.style.color = "";
-}
-
-function setStorage() {
-    return new Promise((resolve, reject) => {
-        const data = {
-            nvocm_desc: memo.value,
-            nvocm_notificationSound: options.notificationSound.checked,
-            nvocm_clearNotificationsTime: options.clearNotificationsTime.checked
-        }
-
-        if (selected.length !== 0) {
-            chrome.action.setBadgeBackgroundColor({color: "#0080ff"});
-            chrome.action.setBadgeTextColor({color: "#fff"});
-            chrome.action.setBadgeText({"text": String(selected[0].dataset.name)});
-
-            data.nvocm_id = selected[0].dataset.id;
-            data.nvocm_name = selected[0].dataset.name;
-        }
-        
-        chrome.storage.local.set(data, () => resolve());
-    })
-}
-
-function getStorage() {
-    return new Promise((resolve, reject) => {
-        chrome.storage.local.get(null, item => resolve(item));
-    })
 }
 
 function showToast(message, autohide) {
@@ -155,12 +163,12 @@ async function previewMylistObject_morePage() {
 
 class previewMylistObject {
     static header = {
-        "headers": {
-            "x-frontend-id": "23",
-            "x-request-with": "N-garage"
-        },
-        "method": "GET",
-        "credentials": "include"
+            "headers": {
+                "x-frontend-id": "23",
+                "x-request-with": "N-garage"
+            },
+            "method": "GET",
+            "credentials": "include"
     }
 
     static mylistObjectList = document.getElementById("mylistObjectList");
@@ -258,7 +266,7 @@ class previewMylistObject {
     deleteMylistObject(itemId) {
         let deleteMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/mylists/${this.mylistId}/items?itemIds=${itemId}`;
         if (this.mylistId == "watchlater") deleteMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/watch-later?itemIds=${itemId}`;
-
+        
         fetch(deleteMylistObject_url, {
             "headers": {
                 "x-frontend-id": "6",
