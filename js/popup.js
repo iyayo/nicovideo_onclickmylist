@@ -3,9 +3,7 @@ const selected = mylistSelect.getElementsByClassName("active");
 const memo = document.getElementById("memo");
 const memoClearButton = document.getElementById("memoClearButton");
 const options = document.forms["options"];
-const mylistObject_base = document.getElementById("mylistObject-main");
 const mylistObject_more = document.getElementById("mylistObject-more");
-let previewMylist;
 
 class localStorage {
     set() {
@@ -29,10 +27,8 @@ class localStorage {
         })
     }
 
-    get() {
-        return new Promise((resolve, reject) => {
-            chrome.storage.local.get(null, item => resolve(item));
-        })
+    async get() {
+        return await chrome.storage.local.get(null);
     }
 
     restore(item) {
@@ -50,7 +46,142 @@ class localStorage {
     }
 }
 
+class previewMylistObject {
+    header = {
+        "get": {
+            "headers": {
+                "x-frontend-id": "23",
+                "x-request-with": "N-garage"
+            },
+            "method": "GET",
+            "credentials": "include"
+        },
+        "delete": {
+            "headers": {
+                "x-frontend-id": "6",
+                "x-request-with": "https://www.nicovideo.jp"
+            },
+            "method": "DELETE",
+            "credentials": "include"
+        }
+    }
+
+    static mylistObjectList = document.getElementById("mylistObjectList");
+    static mylistObject_base = document.getElementById("mylistObject-main");
+    static mylistObject_itemscount = document.getElementById("mylistObject-itemscount");
+
+    constructor(mylistId, name, page) {
+        this.mylistId = mylistId;
+        this.name = name;
+        this.page = page;
+    }
+
+    reset() {
+        this.page = 1;
+        previewMylistObject.mylistObjectList.innerHTML = "";
+        previewMylistObject.mylistObject_itemscount.innerText = "";
+        mylistObject_more.classList.add("d-none");
+    }
+
+    changeMylistName() {
+        const myllistName_url = document.getElementById("myllistName-url");
+        if (this.mylistId == "watchlater") myllistName_url.href = "https://www.nicovideo.jp/my/watchlater";
+        else myllistName_url.href = `https://www.nicovideo.jp/my/mylist/${this.mylistId}`;
+
+        const mylistName = document.getElementById("mylistName");
+        mylistName.innerText = this.name;
+    }
+
+    async getMylistObject() {
+        if (!this.page) this.page = 1;
+        let getMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/mylists/${this.mylistId}?pageSize=100&page=${this.page}`;
+        if (this.mylistId == "watchlater") getMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/watch-later?sortKey=addedAt&sortOrder=desc&pageSize=100&page=${this.page}`;
+
+        try {
+            let response = await fetch(getMylistObject_url, this.header.get);
+            response = await response.json();
+
+            return response;
+        } catch (error) {
+            showToast("マイリストの読み込みに失敗しました", false);
+        }
+    }
+
+    appendMylistObject(obj) {
+        let mylist;
+        if (this.mylistId == "watchlater") {
+            mylist = obj.data.watchLater;
+            document.getElementById("mylistObject-itemscount").innerText = mylist.totalCount;
+        } else {
+            mylist = obj.data.mylist;
+            document.getElementById("mylistObject-itemscount").innerText = mylist.totalItemCount;
+        }
+
+        for (let i = 0; i < mylist.items.length; i++) {
+            const object = mylist.items[i];
+            const mylistObject_template = previewMylistObject.mylistObject_base.cloneNode(true);
+
+            mylistObject_template.dataset.itemid = object.itemId;
+            mylistObject_template.classList.remove("d-none");
+            mylistObject_template.querySelector("#mylistObject-url").href = "https://www.nicovideo.jp/watch/" + object.video.id;
+            mylistObject_template.querySelector("#mylistObject-bodyTitle").innerText = object.video.title;
+            mylistObject_template.querySelector("#mylistObject-thumbnail").src = object.video.thumbnail.url;
+            mylistObject_template.querySelector("#mylistObject-videoLength").innerText = this.timeConvert(object.video.duration);
+            mylistObject_template.querySelector("#mylistObject-action-delete").dataset.itemid = object.itemId;
+            mylistObject_template.querySelector("#mylistObject-action-delete").addEventListener("click", element => { this.deleteMylistObject(element.target.dataset.itemid) });
+
+            if (this.mylistId == "watchlater") {
+                if (object.memo) {
+                    mylistObject_template.querySelector("#mylistObject-memo").innerText = object.memo;
+                    mylistObject_template.querySelector("#mylistObject-memo").classList.remove("d-none");
+                }
+            } else {
+                if (object.description) {
+                    mylistObject_template.querySelector("#mylistObject-memo").innerText = object.description;
+                    mylistObject_template.querySelector("#mylistObject-memo").classList.remove("d-none");
+                }
+            }
+
+            previewMylistObject.mylistObjectList.append(mylistObject_template);
+        }
+
+        if (mylist.hasNext) {
+            mylistObject_more.classList.remove("d-none");
+        } else {
+            mylistObject_more.classList.add("d-none");
+        }
+
+    }
+
+    timeConvert(time) {
+        let min = Math.floor(time / 60);
+        let sec = time % 60;
+
+        if (sec < 10) sec = "0" + sec;
+
+        return min + ":" + sec;
+    }
+
+    async deleteMylistObject(itemId) {
+        let deleteMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/mylists/${this.mylistId}/items?itemIds=${itemId}`;
+        if (this.mylistId == "watchlater") deleteMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/watch-later?itemIds=${itemId}`;
+
+        try {
+            const response = await fetch(deleteMylistObject_url, this.header.delete);
+
+            if (response.status !== 200) return;
+
+            previewMylistObject.mylistObjectList.querySelector(`div[data-itemid="${itemId}"]`).remove();
+            document.getElementById("mylistObject-itemscount").innerText = String(document.getElementById("mylistObject-itemscount").innerText) - 1;
+            showToast("マイリストから削除しました", true);
+        } catch (error) {
+            showToast("削除に失敗しました", false);
+        }
+    }
+}
+
 const storage = new localStorage();
+let previewMylist;
 
 mylistSelect.addEventListener("click", async e => {
     for (let i = 0; i < mylistSelect.children.length; i++) {
@@ -79,25 +210,27 @@ memoClearButton.addEventListener("click", () => {
 options.addEventListener("change", storage.set);
 
 (async () => {
-    await checkUserSession();
-    await getMylist();
+    try {
+        await checkUserSession();
+        await getMylist();
 
-    const item = await storage.get();
-    storage.restore(item);
+        const item = await storage.get();
+        storage.restore(item);
 
-    countMemoLength();
+        countMemoLength();
+    } catch (error) {
+        console.log(error);
+    }
+
 })();
 
-function checkUserSession() {
-    return new Promise((resolve, reject) => {
-        chrome.cookies.get({ url: 'https://www.nicovideo.jp/', name: 'user_session' }, (value) => {
-            if (value != null) resolve();
-            else {
-                showToast("マイリストの取得に失敗しました。ログインしてから再度開いてください", false);
-                reject();
-            }
-        });
-    })
+async function checkUserSession() {
+    const user_session = await chrome.cookies.get({ url: 'https://www.nicovideo.jp/', name: 'user_session' });
+
+    if (user_session != null) return;
+
+    showToast("マイリストの取得に失敗しました。ログインしてから再度開いてください", false);
+    throw new Error("checkUserSession-user_session-null");
 }
 
 function getMylist() {
@@ -161,134 +294,3 @@ async function previewMylistObject_morePage() {
     previewMylist.appendMylistObject(result);
 }
 
-class previewMylistObject {
-    header = {
-        "get": {
-            "headers": {
-                "x-frontend-id": "23",
-                "x-request-with": "N-garage"
-            },
-            "method": "GET",
-            "credentials": "include"
-        },
-        "delete": {
-            "headers": {
-                "x-frontend-id": "6",
-                "x-request-with": "https://www.nicovideo.jp"
-            },
-            "method": "DELETE",
-            "credentials": "include"
-        }
-    }
-
-    static mylistObjectList = document.getElementById("mylistObjectList");
-    static mylistObject_itemscount = document.getElementById("mylistObject-itemscount");
-
-    constructor(mylistId, name, page) {
-        this.mylistId = mylistId;
-        this.name = name;
-        this.page = page;
-    }
-
-    reset() {
-        this.page = 1;
-        previewMylistObject.mylistObjectList.innerHTML = "";
-        previewMylistObject.mylistObject_itemscount.innerText = "";
-    }
-
-    changeMylistName() {
-        const myllistName_url = document.getElementById("myllistName-url");
-        if (this.mylistId == "watchlater") myllistName_url.href = "https://www.nicovideo.jp/my/watchlater";
-        else myllistName_url.href = `https://www.nicovideo.jp/my/mylist/${this.mylistId}`;
-
-        const mylistName = document.getElementById("mylistName");
-        mylistName.innerText = this.name;
-    }
-
-    async getMylistObject() {
-        if (!this.page) this.page = 1;
-        let getMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/mylists/${this.mylistId}?pageSize=100&page=${this.page}`;
-        if (this.mylistId == "watchlater") getMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/watch-later?sortKey=addedAt&sortOrder=desc&pageSize=100&page=${this.page}`;
-
-        try {
-            let response = await fetch(getMylistObject_url, this.header.get);
-            response = await response.json();
-
-            return response;
-        } catch (error) {
-            showToast("マイリストの読み込みに失敗しました", false);
-        }
-    }
-
-    appendMylistObject(obj) {
-        let mylist;
-        if (this.mylistId == "watchlater") {
-            mylist = obj.data.watchLater;
-            document.getElementById("mylistObject-itemscount").innerText = mylist.totalCount;
-        } else {
-            mylist = obj.data.mylist;
-            document.getElementById("mylistObject-itemscount").innerText = mylist.totalItemCount;
-        }
-
-        for (let i = 0; i < mylist.items.length; i++) {
-            const object = mylist.items[i];
-            const mylistObject_template = mylistObject_base.cloneNode(true);
-
-            mylistObject_template.dataset.itemid = object.itemId;
-            mylistObject_template.classList.remove("d-none");
-            mylistObject_template.querySelector("#mylistObject-url").href = "https://www.nicovideo.jp/watch/" + object.video.id;
-            mylistObject_template.querySelector("#mylistObject-bodyTitle").innerText = object.video.title;
-            mylistObject_template.querySelector("#mylistObject-thumbnail").src = object.video.thumbnail.url;
-            mylistObject_template.querySelector("#mylistObject-videoLength").innerText = this.timeConvert(object.video.duration);
-            mylistObject_template.querySelector("#mylistObject-action-delete").dataset.itemid = object.itemId;
-            mylistObject_template.querySelector("#mylistObject-action-delete").addEventListener("click", element => { this.deleteMylistObject(element.target.dataset.itemid) });
-
-            if (this.mylistId == "watchlater") {
-                if (object.memo) {
-                    mylistObject_template.querySelector("#mylistObject-memo").innerText = object.memo;
-                    mylistObject_template.querySelector("#mylistObject-memo").classList.remove("d-none");
-                }
-            } else {
-                if (object.description) {
-                    mylistObject_template.querySelector("#mylistObject-memo").innerText = object.description;
-                    mylistObject_template.querySelector("#mylistObject-memo").classList.remove("d-none");
-                }
-            }
-
-            previewMylistObject.mylistObjectList.append(mylistObject_template);
-        }
-
-        if (mylist.hasNext) {
-            mylistObject_more.classList.remove("d-none");
-        } else {
-            mylistObject_more.classList.add("d-none");
-        }
-
-    }
-
-    timeConvert(time) {
-        let min = Math.floor(time / 60);
-        let sec = time % 60;
-
-        if (sec < 10) sec = "0" + sec;
-
-        return min + ":" + sec;
-    }
-
-    async deleteMylistObject(itemId) {
-        let deleteMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/mylists/${this.mylistId}/items?itemIds=${itemId}`;
-        if (this.mylistId == "watchlater") deleteMylistObject_url = `https://nvapi.nicovideo.jp/v1/users/me/watch-later?itemIds=${itemId}`;
-
-        try {
-            const response = await fetch(deleteMylistObject_url, this.header.delete);
-
-            if (response.status !== 200) return;
-
-            previewMylistObject.mylistObjectList.querySelector(`div[data-itemid="${itemId}"]`).remove();
-            document.getElementById("mylistObject-itemscount").innerText = String(document.getElementById("mylistObject-itemscount").innerText) - 1;
-            showToast("マイリストから削除しました", true);
-        } catch (error) {
-            showToast("削除に失敗しました", false);
-        }
-    }
-}
