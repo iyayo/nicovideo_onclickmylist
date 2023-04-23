@@ -182,6 +182,7 @@ class previewMylistObject {
     }
 
     static mylistObjectList = document.getElementById("mylistObjectList");
+    static mylistObject_itemscount = document.getElementById("mylistObject-itemscount");
 
     constructor(mylistId, name, page) {
         this.mylistId = mylistId;
@@ -192,6 +193,7 @@ class previewMylistObject {
     reset() {
         this.page = 1;
         previewMylistObject.mylistObjectList.innerHTML = "";
+        previewMylistObject.mylistObject_itemscount.innerText = "";
     }
 
     changeMylistName() {
