@@ -111,10 +111,10 @@ class previewMylistObject {
         let mylist;
         if (this.mylistId == "watchlater") {
             mylist = obj.data.watchLater;
-            document.getElementById("mylistObject-itemscount").innerText = mylist.totalCount;
+            previewMylistObject.mylistObject_itemscount.innerText = mylist.totalCount;
         } else {
             mylist = obj.data.mylist;
-            document.getElementById("mylistObject-itemscount").innerText = mylist.totalItemCount;
+            previewMylistObject.mylistObject_itemscount.innerText = mylist.totalItemCount;
         }
 
         for (let i = 0; i < mylist.items.length; i++) {
@@ -172,7 +172,7 @@ class previewMylistObject {
             if (response.status !== 200) return;
 
             previewMylistObject.mylistObjectList.querySelector(`div[data-itemid="${itemId}"]`).remove();
-            document.getElementById("mylistObject-itemscount").innerText = String(document.getElementById("mylistObject-itemscount").innerText) - 1;
+            previewMylistObject.mylistObject_itemscount.innerText = String(previewMylistObject.mylistObject_itemscount.innerText) - 1;
             showToast("マイリストから削除しました", true);
         } catch (error) {
             showToast("削除に失敗しました", false);
