@@ -7,19 +7,26 @@ observer.observe(target, config);
 
 let name = "ワンクリックマイリスト";
 
+const button = document.createElement("button");
+button.id = "onclick_mylist";
+button.className = "ActionButton WatchLaterButton VideoMenuContainer-button";
+button.dataset.title = name;
+button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Pro 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) --><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg>`;
+
+const interval = setInterval(() => {
     const parentNode = document.querySelector(".VideoMenuContainer-areaLeft");
     const referenceNode = document.querySelector("section.VideoMenuLikeFieldContainer").nextSibling;
+
+    if (!parentNode || !referenceNode) return;
+    
     const div = document.createElement("div");
     div.className = "ClickInterceptor LoginRequirer is-inline";
 
-    const button = document.createElement("button");
-    button.id = "onclick_mylist";
-    button.className = "ActionButton WatchLaterButton VideoMenuContainer-button";
-    button.dataset.title = name;
-    button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!-- Font Awesome Pro 5.15.4 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) --><path d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"/></svg>`;
-
     parentNode.insertBefore(div, referenceNode);
     div.appendChild(button);
+
+    clearInterval(interval);
+}, 100);
 
 chrome.storage.local.get(["nvocm_name"], item => {
     if (item.nvocm_name !== undefined) {
