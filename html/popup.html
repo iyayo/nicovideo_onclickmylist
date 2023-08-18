@@ -43,7 +43,7 @@
         </div>
 
         <div class="row">
-            <div class="col-4">
+            <div class="col-4 p-0">
                 <div class="card card-scroll overflow-auto">
                     <ul id="mylistSelect" class="list-group list-group-flush">
                         <li class="list-group-item" data-id="watchlater" data-name="あとで見る">あとで見る</li>
@@ -51,12 +51,12 @@
                 </div>
             </div>
 
-            <div class="col">
+            <div class="col p-0">
                 <div class="tab-content" id="nav-tabContent">
                     <div class="tab-pane fade show active" id="nav-mylists" role="tabpanel"
                         aria-labelledby="nav-mylists-tab">
 
-                        <div id="mylistContainer">
+                        <div id="mylistContainer" class="ps-3">
                             <header>
                                 <a id="myllistName-url" class="text-decoration-none" href="#" target="_blank"><h1 id="mylistName" class="fs-5 fw-bold text-body mt-2"></h1></a>
                                 <div class="d-inline-flex">
@@ -113,19 +113,21 @@
                     </div>
 
                     <div class="tab-pane fade" id="nav-memo" role="tabpanel" aria-labelledby="nav-memo-tab">
-                        <div class="mb-1">
-                            <textarea name="mylistMemo" id="memo" class="form-control" cols="30" rows="10"
-                                maxlength="256" placeholder="省略可"></textarea>
-                        </div>
-
-                        <div class="text-center">
-                            文字数：<span id="memoLength">0</span> / 256
-                            <button id="memoClearButton" class="btn btn-primary btn-sm">クリア</button>
+                        <div class="row px-3">
+                            <div class="mb-1">
+                                <textarea name="mylistMemo" id="memo" class="form-control" cols="30" rows="10"
+                                    maxlength="256" placeholder="省略可"></textarea>
+                            </div>
+    
+                            <div class="text-center">
+                                文字数：<span id="memoLength">0</span> / 256
+                                <button id="memoClearButton" class="btn btn-primary btn-sm">クリア</button>
+                            </div>
                         </div>
                     </div>
 
                     <div class="tab-pane fade" id="nav-options" role="tabpanel" aria-labelledby="nav-options-tab">
-                        <div class="row">
+                        <div class="row px-3">
                             <div class="col">
                                 <div class="card h-100">
                                     <div class="card-header">右クリックメニュー</div>

@@ -5,11 +5,11 @@ body {
 }
 
 #mylistSelect {
-    max-height: 530px;
+    max-height: 537px;
 }
 
 #mylistContainer {
-    height: 530px;
+    max-height: 537px;
     overflow-y: auto;
 }
 
