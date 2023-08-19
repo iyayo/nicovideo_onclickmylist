@@ -13,10 +13,6 @@ body {
     overflow-y: auto;
 }
 
-.mylistItemsCount {
-    pointer-events: none;
-}
-
 #mylistObject-videoLength {
     bottom: 2px;
     right: 16px;
