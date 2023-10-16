@@ -11,7 +11,8 @@ class localStorage {
             const data = {
                 nvocm_desc: memo.value,
                 nvocm_notificationSound: options.notificationSound.checked,
-                nvocm_clearNotificationsTime: options.clearNotificationsTime.checked
+                nvocm_clearNotificationsTime: options.clearNotificationsTime.checked,
+                nvocm_wayOpenVideo: options.wayOpenVideo.value,
             }
 
             if (selected.length !== 0) {
@@ -43,6 +44,12 @@ class localStorage {
         if (item.nvocm_desc !== undefined) memo.value = item.nvocm_desc;
         if (item.nvocm_notificationSound !== undefined) options.notificationSound.checked = item.nvocm_notificationSound;
         if (item.nvocm_clearNotificationsTime !== undefined) options.clearNotificationsTime.checked = item.nvocm_clearNotificationsTime;
+
+        if (item.nvocm_wayOpenVideo !== undefined) {
+            options.querySelectorAll("#wayOpenVideo > option").forEach(element => {
+                if (element.value === item.nvocm_wayOpenVideo) element.selected = true;
+            })
+        }
     }
 }
 
@@ -129,6 +136,16 @@ class previewMylistObject {
             mylistObject_template.querySelector("#mylistObject-videoLength").innerText = this.timeConvert(object.video.duration);
             mylistObject_template.querySelector("#mylistObject-action-delete").dataset.itemid = object.itemId;
             mylistObject_template.querySelector("#mylistObject-action-delete").addEventListener("click", element => { this.deleteMylistObject(element.target.dataset.itemid) });
+
+            mylistObject_template.querySelector("#mylistObject-url").addEventListener("click", event => {
+                if (options.wayOpenVideo.value === "currentTab") {
+                    chrome.tabs.query({ active: true, currentWindow: true, lastFocusedWindow: true },tab => {
+                        chrome.tabs.update(tab[0].id,{url: mylistObject_template.querySelector("#mylistObject-url").href})
+                    })
+
+                    event.preventDefault();
+                }
+           })
 
             if (this.mylistId == "watchlater") {
                 if (object.memo) {

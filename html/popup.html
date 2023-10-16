@@ -127,8 +127,20 @@
                     </div>
 
                     <div class="tab-pane fade" id="nav-options" role="tabpanel" aria-labelledby="nav-options-tab">
+                        <form name="options">
                         <div class="row px-3">
-                            <div class="col">
+                                <div class="col-6 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-header">動作</div>
+                                        <div class="card-body">
+                                                <label for="wayOpenVideo" class="form-label">動画の開き方</label>
+                                                <select id="wayOpenVideo" class="form-select">
+                                                    <option value="currentTab" selected>現在のタブで開く</option>
+                                                    <option value="newTab">新しいタブで開く</option>
+                                                </select>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="card h-100">
                                     <div class="card-header">右クリックメニュー</div>
                                     <div class="card-body">
@@ -160,6 +172,7 @@
                                 </div>
                             </div>
                         </div>
+                        </form>
                     </div>
                 </div>
             </div>
