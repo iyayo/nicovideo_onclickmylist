@@ -27,8 +27,8 @@ class localStorage {
         })
     }
 
-    async get() {
-        return await chrome.storage.local.get(null);
+    async get(key = null) {
+        return await chrome.storage.local.get(key);
     }
 
     restore(item) {
