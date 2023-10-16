@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-bs-theme="auto">
 
 <head>
     <meta charset="UTF-8">
@@ -11,7 +11,7 @@
 
 <body aria-live="polite" aria-atomic="true" class="position-relative">
     <header>
-        <nav class="navbar navbar-light bg-light">
+        <nav class="navbar bg-body-tertiary">
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">
                     <img src="/icon/icon32.png" alt="Logo" width="32" height="32" class="d-inline-block align-text-top">
@@ -106,7 +106,7 @@
                             </div>
 
                             <div id="mylistObject-more" class="card border-0 d-none">
-                                <button id="mylistObject-more-button" class="btn btn-light" type="button">さらに読み込む…</button>
+                                <button id="mylistObject-more-button" class="btn bg-body-secondary" type="button">さらに読み込む…</button>
                             </div>
                         </div>
 
@@ -128,7 +128,7 @@
 
                     <div class="tab-pane fade" id="nav-options" role="tabpanel" aria-labelledby="nav-options-tab">
                         <form name="options">
-                        <div class="row px-3">
+                            <div class="row px-3">
                                 <div class="col-6 mb-3">
                                     <div class="card h-100">
                                         <div class="card-header">動作</div>
@@ -141,37 +141,51 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="card h-100">
-                                    <div class="card-header">右クリックメニュー</div>
-                                    <div class="card-body">
-                                        <form name="options">
-                                            <div class="form-check form-switch">
-                                                <input type="checkbox" name="notificationSound" id="notificationSound"
-                                                    class="form-check-input">
-                                                <label class="form-check-label" for="notificationSound">通知音を消す</label>
-                                            </div>
-                                            <div class="form-check form-switch">
-                                                <input type="checkbox" name="clearNotificationsTime"
-                                                    id="clearNotificationsTime" class="form-check-input">
-                                                <label class="form-check-label"
-                                                    for="clearNotificationsTime">通知の自動消去（1分後）</label>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <div class="col">
-                                <div class="card h-100">
-                                    <div class="card-header">お問い合わせ</div>
-                                    <div class="card-body">
-                                        <p class="card-text">質問・不具合・要望などはサポートからどうぞ。</p>
-                                        <a href="https://chrome.google.com/webstore/detail/%E3%83%8B%E3%82%B3%E3%83%8B%E3%82%B3%E5%8B%95%E7%94%BB-%E3%83%AF%E3%83%B3%E3%82%AF%E3%83%AA%E3%83%83%E3%82%AF%E3%83%9E%E3%82%A4%E3%83%AA%E3%82%B9%E3%83%88/majibbkdipkpbikeejejgoinbgbdmdhf?hl=ja&authuser=0"
-                                            class="btn btn-primary" target="_blank">サポートを開く</a>
+                                <div class="col-6 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-header">右クリックメニュー</div>
+                                        <div class="card-body">
+                                                <div class="form-check form-switch">
+                                                    <input type="checkbox" name="notificationSound" id="notificationSound"
+                                                        class="form-check-input">
+                                                    <label class="form-check-label" for="notificationSound">通知音を消す</label>
+                                                </div>
+                                                <div class="form-check form-switch">
+                                                    <input type="checkbox" name="clearNotificationsTime"
+                                                        id="clearNotificationsTime" class="form-check-input">
+                                                    <label class="form-check-label"
+                                                        for="clearNotificationsTime">通知の自動消去（1分後）</label>
+                                                </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-6 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-header">外観</div>
+                                        <div class="card-body">
+                                                <label for="theme" class="form-label">テーマ</label>
+                                                <select id="theme" class="form-select">
+                                                    <option value="auto" selected>自動</option>
+                                                    <option value="light">ライト</option>
+                                                    <option value="dark">ダーク</option>
+                                                </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-6 mb-3">
+                                    <div class="card h-100">
+                                        <div class="card-header">お問い合わせ</div>
+                                        <div class="card-body">
+                                            <p class="card-text">質問・不具合・要望などはサポートからどうぞ。</p>
+                                            <a href="https://chrome.google.com/webstore/detail/%E3%83%8B%E3%82%B3%E3%83%8B%E3%82%B3%E5%8B%95%E7%94%BB-%E3%83%AF%E3%83%B3%E3%82%AF%E3%83%AA%E3%83%83%E3%82%AF%E3%83%9E%E3%82%A4%E3%83%AA%E3%82%B9%E3%83%88/majibbkdipkpbikeejejgoinbgbdmdhf?hl=ja&authuser=0"
+                                                class="btn btn-primary" target="_blank">サポートを開く</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
                         </form>
                     </div>
                 </div>

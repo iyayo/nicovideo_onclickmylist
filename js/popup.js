@@ -13,6 +13,7 @@ class localStorage {
                 nvocm_notificationSound: options.notificationSound.checked,
                 nvocm_clearNotificationsTime: options.clearNotificationsTime.checked,
                 nvocm_wayOpenVideo: options.wayOpenVideo.value,
+                nvocm_theme: options.theme.value
             }
 
             if (selected.length !== 0) {
@@ -48,6 +49,12 @@ class localStorage {
         if (item.nvocm_wayOpenVideo !== undefined) {
             options.querySelectorAll("#wayOpenVideo > option").forEach(element => {
                 if (element.value === item.nvocm_wayOpenVideo) element.selected = true;
+            })
+        }
+
+        if (item.nvocm_theme !== undefined) {
+            options.querySelectorAll("#theme > option").forEach(element => {
+                if (element.value === item.nvocm_theme) element.selected = true;
             })
         }
     }
@@ -200,6 +207,9 @@ class previewMylistObject {
 const storage = new localStorage();
 let previewMylist;
 
+window.addEventListener('DOMContentLoaded', setTheme);
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", setTheme);
+
 mylistSelect.addEventListener("click", async e => {
     for (let i = 0; i < mylistSelect.children.length; i++) {
         mylistSelect.children[i].classList.remove("active");
@@ -224,7 +234,10 @@ memoClearButton.addEventListener("click", () => {
     countMemoLength();
 });
 
-options.addEventListener("change", storage.set);
+options.addEventListener("change", () => {
+    storage.set();
+    setTheme();
+});
 
 (async () => {
     try {
@@ -297,6 +310,16 @@ function showToast(message, autohide) {
     toast.show();
 }
 
+async function setTheme() {
+    const item = await storage.get("nvocm_theme");
+    
+    if (item.nvocm_theme === undefined && window.matchMedia("(prefers-color-scheme: dark)").matches || item.nvocm_theme === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.documentElement.setAttribute("data-bs-theme", "dark");
+    } else {
+        document.documentElement.setAttribute("data-bs-theme", item.nvocm_theme);
+    }
+}
+
 async function previewMylistObject_firstPage(mylistId, name) {
     previewMylist = new previewMylistObject(mylistId, name);
 
@@ -310,4 +333,3 @@ async function previewMylistObject_morePage() {
     let result = await previewMylist.getMylistObject();
     previewMylist.appendMylistObject(result);
 }
-
