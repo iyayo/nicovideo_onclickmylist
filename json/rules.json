@@ -8,6 +8,17 @@
           { "header": "Origin", "operation": "set", "value": "https://www.nicovideo.jp" }
         ]
       },
-      "condition": { "urlFilter": "https://nvapi.nicovideo.jp/v1/users/me/*", "resourceTypes": ["xmlhttprequest"], "excludedDomains": ["www.upload.nicovideo.jp"]}
+      "condition": { "urlFilter": "https://nvapi.nicovideo.jp/v1/users/me/watch-later", "resourceTypes": ["xmlhttprequest"]}
+    },
+    {
+      "id": 2,
+      "priority": 1,
+      "action": {
+        "type": "modifyHeaders",
+        "requestHeaders": [
+          { "header": "Origin", "operation": "set", "value": "https://www.nicovideo.jp" }
+        ]
+      },
+      "condition": { "urlFilter": "https://nvapi.nicovideo.jp/v1/users/me/mylists/*", "resourceTypes": ["xmlhttprequest"]}
     }
   ]
