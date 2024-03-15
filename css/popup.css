@@ -8,8 +8,9 @@ body {
     max-height: 537px;
 }
 
-#mylistContainer, #nicorepoContainer {
+#mylistContainer, #nicorepoContainer, #nav-options{
     max-height: 537px;
+    overflow-x: hidden;
     overflow-y: auto;
 }
 
