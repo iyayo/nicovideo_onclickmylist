@@ -4,6 +4,8 @@ const memo = document.getElementById("memo");
 const memoClearButton = document.getElementById("memoClearButton");
 const options = document.forms["options"];
 const mylistObject_more = document.getElementById("mylistObject-more");
+const nicorepo_reload = document.getElementById("nicorepo-reload");
+const nicorepo_more = document.getElementById("nicorepo-more");
 
 class localStorage {
     set() {
@@ -146,13 +148,13 @@ class previewMylistObject {
 
             mylistObject_template.querySelector("#mylistObject-url").addEventListener("click", event => {
                 if (options.wayOpenVideo.value === "currentTab") {
-                    chrome.tabs.query({ active: true, currentWindow: true, lastFocusedWindow: true },tab => {
-                        chrome.tabs.update(tab[0].id,{url: mylistObject_template.querySelector("#mylistObject-url").href})
+                    chrome.tabs.query({ active: true, currentWindow: true, lastFocusedWindow: true }, tab => {
+                        chrome.tabs.update(tab[0].id, { url: mylistObject_template.querySelector("#mylistObject-url").href })
                     })
 
                     event.preventDefault();
                 }
-           })
+            })
 
             if (this.mylistId == "watchlater") {
                 if (object.memo) {
@@ -204,8 +206,102 @@ class previewMylistObject {
     }
 }
 
+class NicoRepo {
+    header = {
+        "headers": {
+            "x-frontend-id": "6"
+        },
+        "method": "GET",
+        "credentials": "include"
+    }
+
+    untilId = "";
+
+    nicorepoObjectList = document.getElementById("nicorepoObjectList");
+    nicorepoObject_base = document.getElementById("nicorepoObject-main");
+    
+    constructor() {
+        this.nicorepoObjectList.innerHTML = "";
+        nicorepo_more.classList.add("d-none");
+    }
+
+    async get_nicorepo() {
+        try {
+            let response = await fetch(`https://api.repoline.nicovideo.jp/v1/timelines/nicorepo/last-1-month/my/pc/entries.json?object%5Btype%5D=video&type=upload&untilId=${this.untilId}`, this.header);
+            response = await response.json();
+
+            this.untilId = response.meta.minId;
+    
+            return response;
+        } catch (error) {
+            showToast("ニコレポの読み込みに失敗しました", false);
+        }
+    }
+
+    append_nicorepo(result) {
+        for (let i = 0; i < result.data.length; i++) {
+            const object = result.data[i];
+            const nicorepoObject_template = this.nicorepoObject_base.cloneNode(true);
+    
+            nicorepoObject_template.classList.remove("d-none");
+            nicorepoObject_template.querySelector("#nicorepoObject-icon").src = object.actor.icon;
+            nicorepoObject_template.querySelector("#nicorepoObject-user").href = object.actor.url;
+            nicorepoObject_template.querySelector("#nicorepoObject-name").innerText = object.actor.name;
+            
+            const date = this.updated_date_convert(object.updated);
+            nicorepoObject_template.querySelector("#nicorepoObject-updated").innerText = date;
+
+            if (date < 24) {
+                nicorepoObject_template.querySelector("#nicorepoObject-updated").innerText += "時間前";
+                nicorepoObject_template.querySelector("#nicorepoObject-updated").classList.add("new");
+            }
+
+            nicorepoObject_template.querySelector("#nicorepoObject-url").href = object.object.url;
+            nicorepoObject_template.querySelector("#nicorepoObject-bodyTitle").innerText = object.object.name;
+            nicorepoObject_template.querySelector("#nicorepoObject-thumbnail").src = object.object.image;
+
+
+            
+    
+            nicorepoObject_template.querySelector("#nicorepoObject-url").addEventListener("click", event => {
+                if (options.wayOpenVideo.value === "currentTab") {
+                    chrome.tabs.query({ active: true, currentWindow: true, lastFocusedWindow: true }, tab => {
+                        chrome.tabs.update(tab[0].id, { url: nicorepoObject_template.querySelector("#nicorepoObject-url").href })
+                    })
+    
+                    event.preventDefault();
+                }
+            })
+    
+            this.nicorepoObjectList.append(nicorepoObject_template);
+        }
+    
+        if (result.meta.hasNext) nicorepo_more.classList.remove("d-none");
+        else nicorepo_more.classList.add("d-none");
+    }
+
+    updated_date_convert(date) {
+        const now = new Date();
+        const start = new Date(date);
+
+        const time = Math.floor((now - start) / (60 * 60 * 1000));
+
+        if (time < 24) {
+            return time;
+        } else {
+            const formated = new Intl.DateTimeFormat("default", {
+                dateStyle: "medium",
+                timeStyle: "short",
+            }).format(start);
+
+            return formated;
+        }
+    }
+}
+
 const storage = new localStorage();
 let previewMylist;
+let nicorepo = new NicoRepo();
 
 window.addEventListener('DOMContentLoaded', setTheme);
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", setTheme);
@@ -248,6 +344,8 @@ options.addEventListener("change", () => {
         storage.restore(item);
 
         countMemoLength();
+
+        nicorepo.append_nicorepo(await nicorepo.get_nicorepo());
     } catch (error) {
         console.log(error);
     }
@@ -312,7 +410,7 @@ function showToast(message, autohide) {
 
 async function setTheme() {
     const item = await storage.get("nvocm_theme");
-    
+
     if (item.nvocm_theme === undefined && window.matchMedia("(prefers-color-scheme: dark)").matches || item.nvocm_theme === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches) {
         document.documentElement.setAttribute("data-bs-theme", "dark");
     } else {
@@ -333,3 +431,16 @@ async function previewMylistObject_morePage() {
     let result = await previewMylist.getMylistObject();
     previewMylist.appendMylistObject(result);
 }
+
+nicorepo_reload.addEventListener("click", async () => {
+    nicorepo = new NicoRepo();
+    let result = await nicorepo.get_nicorepo();
+
+    nicorepo.append_nicorepo(result);
+})
+
+nicorepo_more.addEventListener("click", async () => {
+    let result = await nicorepo.get_nicorepo();
+
+    nicorepo.append_nicorepo(result);
+})

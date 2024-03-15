@@ -8,7 +8,7 @@ body {
     max-height: 537px;
 }
 
-#mylistContainer {
+#mylistContainer, #nicorepoContainer {
     max-height: 537px;
     overflow-y: auto;
 }
@@ -19,13 +19,17 @@ body {
     background-color: rgba(0,0,0,.5);
 }
 
-#mylistObject-bodyTitle {
+#mylistObject-bodyTitle, #nicorepoObject-bodyTitle {
     -webkit-line-clamp: 2;
     display: -webkit-box;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
-#mylistObject-url:hover #mylistObject-bodyTitle {
+#mylistObject-url:hover #mylistObject-bodyTitle, #nicorepoObject-user:hover #nicorepoObject-name ,#nicorepoObject-url:hover #nicorepoObject-bodyTitle {
     color: #0080ff !important;
+}
+
+.new {
+    color: #d0021b;
 }

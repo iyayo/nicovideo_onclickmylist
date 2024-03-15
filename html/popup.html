@@ -19,6 +19,9 @@
                 </a>
                 <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                        <button type="button" class="nav-link" id="nav-nicorepo-tab" data-bs-toggle="tab"
+                            data-bs-target="#nav-nicorepo" type="button" role="tab" aria-controls="nav-nicorepo"
+                            aria-selected="true"><i id="nicorepo-reload" class="bi bi-arrow-clockwise me-1"></i>ニコレポ</button>
                         <button type="button" class="nav-link active" id="nav-mylists-tab" data-bs-toggle="tab"
                             data-bs-target="#nav-mylists" type="button" role="tab" aria-controls="nav-mylists"
                             aria-selected="true">マイリスト</button>
@@ -58,7 +61,9 @@
 
                         <div id="mylistContainer" class="ps-3">
                             <header>
-                                <a id="myllistName-url" class="text-decoration-none" href="#" target="_blank"><h1 id="mylistName" class="fs-5 fw-bold text-body mt-2"></h1></a>
+                                <a id="myllistName-url" class="text-decoration-none" href="#" target="_blank">
+                                    <h1 id="mylistName" class="fs-5 fw-bold text-body mt-2"></h1>
+                                </a>
                                 <div class="d-inline-flex">
                                     <span><span id="mylistObject-itemscount"></span>件</span>
                                 </div>
@@ -70,19 +75,21 @@
                             <div id="mylistObject-main" class="card border-0 d-none">
                                 <div class="row g-0">
                                     <div class="col-11">
-                                        <a id="mylistObject-url" href="#"
-                                            class="row text-decoration-none" target="_blank">
+                                        <a id="mylistObject-url" href="#" class="row text-decoration-none"
+                                            target="_blank">
                                             <div class="col position-relative" style="width: 144px;">
-                                                <img id="mylistObject-thumbnail"
-                                                    src=""
-                                                    class="rounded img-fluid border"
+                                                <img id="mylistObject-thumbnail" src="" class="rounded img-fluid border"
                                                     style="width: 144px;  height: 78px; object-fit: cover;">
-                                                
-                                                <small><div id="mylistObject-videoLength" class="position-absolute rounded text-white px-1"></div></small>
+
+                                                <small>
+                                                    <div id="mylistObject-videoLength"
+                                                        class="position-absolute rounded text-white px-1"></div>
+                                                </small>
                                             </div>
                                             <div class="col-8 g-0">
                                                 <div class="card-body p-1">
-                                                    <h2 id="mylistObject-bodyTitle" class="card-title fs-6 lh-1 text-body align-baseline"></h2>
+                                                    <h2 id="mylistObject-bodyTitle"
+                                                        class="card-title fs-6 lh-1 text-body align-baseline"></h2>
                                                 </div>
                                             </div>
                                         </a>
@@ -95,21 +102,71 @@
                                                 <i class="bi bi-three-dots-vertical"></i>
                                             </button>
                                             <ul class="dropdown-menu shadow-lg" aria-labelledby="dropdownMenu">
-                                                <li><button id="mylistObject-action-delete" class="dropdown-item" type="button">マイリストから削除</button></li>
+                                                <li><button id="mylistObject-action-delete" class="dropdown-item"
+                                                        type="button">マイリストから削除</button></li>
                                             </ul>
                                         </div>
                                     </div>
 
-                                    <small><div id="mylistObject-memo" class="bg-body-secondary mt-2 p-2 d-none"></div></small>
+                                    <small>
+                                        <div id="mylistObject-memo" class="bg-body-secondary mt-2 p-2 d-none"></div>
+                                    </small>
                                 </div>
                                 <hr class="my-2">
                             </div>
 
                             <div id="mylistObject-more" class="card border-0 d-none">
-                                <button id="mylistObject-more-button" class="btn bg-body-secondary" type="button">さらに読み込む…</button>
+                                <button id="mylistObject-more-button" class="btn bg-body-secondary"
+                                    type="button">さらに読み込む…</button>
                             </div>
                         </div>
 
+                    </div>
+
+                    <div class="tab-pane fade" id="nav-nicorepo" role="tabpanel" aria-labelledby="nav-nicorepo-tab">
+                        <div id="nicorepoContainer" class="ps-3">
+                            <div id="nicorepoObjectList"></div>
+
+                            <div id="nicorepoObject-main" class="card border-0 d-none">
+                                <div class="row g-0">
+                                    <div class="col-11">
+                                        <div class="card-header border-0 p-0 bg-body">
+                                            <div class="navbar">
+                                                <a id="nicorepoObject-user" class="navbar-brand text-decoration-none"
+                                                    href="" target="_blank">
+                                                    <img id="nicorepoObject-icon" src=""
+                                                        style="width: 40px; height: 40px; border-radius: 50%;"></img>
+                                                    <div id="nicorepoObject-name" class="d-inline-block fs-6"></div>
+                                                </a>
+                                                <small id="nicorepoObject-updated"></small>
+                                            </div>
+                                        </div>
+
+                                        <a id="nicorepoObject-url" href="#" class="row text-decoration-none"
+                                            target="_blank">
+                                            <div class="col position-relative" style="width: 144px;">
+                                                <img id="nicorepoObject-thumbnail" src=""
+                                                    class="rounded img-fluid border"
+                                                    style="width: 144px;  height: 78px; object-fit: cover;">
+                                            </div>
+                                            <div class="col-8 g-0">
+                                                <div class="card-body p-1">
+                                                    <h2 id="nicorepoObject-bodyTitle"
+                                                        class="card-title fs-6 lh-1 text-body align-baseline"></h2>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <hr class="my-2">
+                            </div>
+
+                            <div id="nicorepo-more" class="card border-0 d-none">
+                                <button id="nicorepo-more-button" class="btn bg-body-secondary"
+                                    type="button">さらに読み込む…</button>
+                            </div>
+
+                        </div>
                     </div>
 
                     <div class="tab-pane fade" id="nav-memo" role="tabpanel" aria-labelledby="nav-memo-tab">
@@ -118,7 +175,7 @@
                                 <textarea name="mylistMemo" id="memo" class="form-control" cols="30" rows="10"
                                     maxlength="256" placeholder="省略可"></textarea>
                             </div>
-    
+
                             <div class="text-center">
                                 文字数：<span id="memoLength">0</span> / 256
                                 <button id="memoClearButton" class="btn btn-primary btn-sm">クリア</button>
@@ -133,11 +190,11 @@
                                     <div class="card h-100">
                                         <div class="card-header">動作</div>
                                         <div class="card-body">
-                                                <label for="wayOpenVideo" class="form-label">動画の開き方</label>
-                                                <select id="wayOpenVideo" class="form-select">
-                                                    <option value="currentTab" selected>現在のタブで開く</option>
-                                                    <option value="newTab">新しいタブで開く</option>
-                                                </select>
+                                            <label for="wayOpenVideo" class="form-label">動画の開き方</label>
+                                            <select id="wayOpenVideo" class="form-select">
+                                                <option value="currentTab" selected>現在のタブで開く</option>
+                                                <option value="newTab">新しいタブで開く</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -146,17 +203,17 @@
                                     <div class="card h-100">
                                         <div class="card-header">右クリックメニュー</div>
                                         <div class="card-body">
-                                                <div class="form-check form-switch">
-                                                    <input type="checkbox" name="notificationSound" id="notificationSound"
-                                                        class="form-check-input">
-                                                    <label class="form-check-label" for="notificationSound">通知音を消す</label>
-                                                </div>
-                                                <div class="form-check form-switch">
-                                                    <input type="checkbox" name="clearNotificationsTime"
-                                                        id="clearNotificationsTime" class="form-check-input">
-                                                    <label class="form-check-label"
-                                                        for="clearNotificationsTime">通知の自動消去（1分後）</label>
-                                                </div>
+                                            <div class="form-check form-switch">
+                                                <input type="checkbox" name="notificationSound" id="notificationSound"
+                                                    class="form-check-input">
+                                                <label class="form-check-label" for="notificationSound">通知音を消す</label>
+                                            </div>
+                                            <div class="form-check form-switch">
+                                                <input type="checkbox" name="clearNotificationsTime"
+                                                    id="clearNotificationsTime" class="form-check-input">
+                                                <label class="form-check-label"
+                                                    for="clearNotificationsTime">通知の自動消去（1分後）</label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -165,12 +222,12 @@
                                     <div class="card h-100">
                                         <div class="card-header">外観</div>
                                         <div class="card-body">
-                                                <label for="theme" class="form-label">テーマ</label>
-                                                <select id="theme" class="form-select">
-                                                    <option value="auto" selected>自動</option>
-                                                    <option value="light">ライト</option>
-                                                    <option value="dark">ダーク</option>
-                                                </select>
+                                            <label for="theme" class="form-label">テーマ</label>
+                                            <select id="theme" class="form-select">
+                                                <option value="auto" selected>自動</option>
+                                                <option value="light">ライト</option>
+                                                <option value="dark">ダーク</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -195,11 +252,13 @@
     </div>
 
     <div id="toastContainer" class="toast-container position-absolute bottom-0 end-0 p-3">
-        <div class="toast align-items-center text-light bg-dark border-0" role="alert" aria-live="assertive" aria-atomic="true">
-          <div class="d-flex">
-            <div class="toast-body"></div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-          </div>
+        <div class="toast align-items-center text-light bg-dark border-0" role="alert" aria-live="assertive"
+            aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"
+                    aria-label="Close"></button>
+            </div>
         </div>
     </div>
 
