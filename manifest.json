@@ -1,6 +1,6 @@
 {
   "name": "ニコニコ動画 ワンクリックマイリスト",
-  "version": "3.2",
+  "version": "3.2.1",
   "manifest_version": 3,
   "description": "ワンクリックで指定したマイリストに動画を登録できる拡張機能です。",
   "icons" : {
